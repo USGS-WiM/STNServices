@@ -1,9 +1,9 @@
 [
   {
-    "name": "WaerUseServices",
+    "name": "STNServices",
     "organization": "U.S. Geological Survey",
-    "description": "StreamStats custom REST Wateruse services",
-    "version": "v0.0.0",
+    "description": "STN custom REST STNServices",
+    "version": "v3.0.0",
     "statusOptionsURL":"https://github.com/GSA/code-gov-web/blob/master/src/assets/schemas/2.0.0.json#L144-L152",
 	"status": "preliminary",	
 
@@ -18,18 +18,17 @@
     },
 
     "homepageURL": "https://wim.usgs.gov",
-    "downloadURL": "https://github.com/USGS-WiM/WaerUseServices/archive/master.zip",
-    "disclaimerURL": "https://github.com/USGS-WiM/WaerUseServices/blob/master/LICENSE.md",
-    "repositoryUrl": "https://github.com/USGS-WiM/WaerUseServices",
+    "downloadURL": "https://github.com/USGS-WiM/STNServices/archive/master.zip",
+    "disclaimerURL": "https://github.com/USGS-WiM/STNUseServices/blob/master/LICENSE.md",
+    "repositoryUrl": "https://github.com/USGS-WiM/STNUseServices",
     "vcs": "git",
 
     "laborHours": null,
 
     "tags": [
-      "Streamstats",
+      "STN",
       "Services",
-	  "REST",
-	  "Wateruse"
+	  "REST"
     ],
 
     "languages": [
@@ -37,8 +36,8 @@
     ],
 
     "contact": {
-      "name": "Jeremy Newson",
-      "email": "jknewson@usgs.gov"
+      "name": "Tonia Roddick",
+      "email": "troddick@usgs.gov"
     },
 
     "date": {

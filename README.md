@@ -2,7 +2,7 @@
 
 # Navigation Services
 
-StreamStats supporting wateruse REST web services.
+STN supporting STNServices REST web services.
 
 ### Prerequisites
 
