@@ -93,14 +93,14 @@ namespace STNServices.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(eventId) || string.IsNullOrEmpty(State)) return new BadRequestResult();
+                if (string.IsNullOrEmpty(eventId) && string.IsNullOrEmpty(State)) return new BadRequestResult();
 
                 Int32 filterEvent = (!string.IsNullOrEmpty(eventId)) ? Convert.ToInt32(eventId) : -1;
 
                 IQueryable<hwm> query = agent.Select<hwm>().Include(h => h.site);
                 if (filterEvent > 0)
                     query = query.Where(h => h.event_id == filterEvent);
-                if (State != "")
+                if (State != null)
                     query = query.Where(h => h.site.state.ToUpper() == State.ToUpper());
 
                 if (query == null) return new BadRequestObjectResult(new Error(errorEnum.e_notFound));
