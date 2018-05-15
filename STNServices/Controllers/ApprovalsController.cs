@@ -29,6 +29,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace STNServices.Controllers
 {
+    [Route("[controller]")]
     public class ApprovalsController : STNControllerBase
     {
         public ApprovalsController(ISTNServicesAgent sa) : base(sa)
