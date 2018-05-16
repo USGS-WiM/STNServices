@@ -205,7 +205,7 @@ namespace STNServices.Controllers
             Int32 loggedInUserId = 0;
             try
             {
-                if (id < 0 || !isValid(entity)) return new BadRequestResult();
+                if (id < 0 || !isValid(entity.contact_id)) return new BadRequestResult();
 
                 // last_updated parts
                 var loggedInMember = LoggedInUser();
