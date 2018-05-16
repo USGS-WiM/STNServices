@@ -95,7 +95,7 @@ namespace STNServices.Controllers
             {
                 if (string.IsNullOrEmpty(StateAbbrev)) return new BadRequestResult(); // This returns HTTP 404
 
-                var objectsRequested = agent.Select<states>().Include(s=>s.counties).FirstOrDefault(x => x.state_abbrev == StateAbbrev).counties;
+                var objectsRequested = agent.Select<states>().Include(s => s.counties).FirstOrDefault(x => x.state_abbrev == StateAbbrev).counties;
                 if (objectsRequested == null) return new BadRequestObjectResult(new Error(errorEnum.e_notFound)); 
 
                 //sm(agent.Messages);

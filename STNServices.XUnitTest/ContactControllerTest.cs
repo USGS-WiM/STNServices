@@ -44,8 +44,8 @@ namespace STNServices.XUnitTest
             var result = Assert.IsType<EnumerableQuery<contact>>(okResult.Value);
             
             Assert.Equal(2, result.Count());
-            Assert.Equal("Jane", result.LastOrDefault().fname);
-            Assert.Equal("Doe", result.LastOrDefault().lname);
+            Assert.Equal("John", result.LastOrDefault().fname);
+            Assert.Equal("Smith", result.LastOrDefault().lname);
         }
 
         [Fact]
