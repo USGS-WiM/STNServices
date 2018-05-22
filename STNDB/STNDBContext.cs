@@ -95,13 +95,31 @@ namespace STNDB
                 .WithMany(m => m.survey_memberHWMs)
                 .HasForeignKey(p => p.survey_member_id);
 
-            /* handle cascade delete (instruments --> instrument_status)
-            modelBuilder.Entity<instrument_status>()
-                .HasOne(p => p.instrument)
-                .WithMany(b => b.instrument_status)
-                .OnDelete(DeleteBehavior.Cascade);
 
-            */
+            // Cascade delete handlers
+            
+            // HWM --> HWM files
+            //modelBuilder.Entity<file>()
+            //    .HasOne(h => h.hwm)
+            //    .WithMany(f => f.files)
+            //    .OnDelete(DeleteBehavior.Cascade); 
+
+
+            // instruments --> instrument_status
+            //modelBuilder.Entity<instrument_status>()
+            //    .HasOne(p => p.instrument)
+            //    .WithMany(b => b.instrument_status)
+            //    .OnDelete(DeleteBehavior.Cascade);
+
+            // ObjectivePoints --> opFiles
+
+            //modelBuilder.Entity<file>()
+            //    .HasOne(o => o.objective_point)
+            //    .WithMany(f => f.files)
+            //    .OnDelete(DeleteBehavior.Cascade);
+
+            // ObjectivePoints RemoveFileItems? wat dat
+
 
             base.OnModelCreating(modelBuilder);             
         }

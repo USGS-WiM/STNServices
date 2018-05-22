@@ -30,6 +30,7 @@ using STNAgent.Resources;
 using System.Threading.Tasks;
 using WiM.Security.Authentication.Basic;
 using WiM.Resources;
+using System.Reflection;
 
 namespace STNAgent
 {
@@ -1152,6 +1153,40 @@ namespace STNAgent
                 }).FirstOrDefault<recent_op>();
 
             return recentop;
+        }
+
+        protected new IQueryable<T> FromSQL<T>(String sql) where T : class, new()
+        {
+            try
+            {
+                using (var cmd = this.context.Database.GetDbConnection().CreateCommand())
+                {
+                    cmd.CommandText = sql;
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    context.Database.OpenConnection();
+                    using (var result = cmd.ExecuteReader())
+                    {
+                        List<T> query = new List<T>();
+                        T obj = default(T);
+                        while (result.Read())
+                        {
+                            obj = Activator.CreateInstance<T>();
+                            foreach (PropertyInfo item in obj.GetType().GetProperties())
+                            {
+                                if (!object.Equals(result[item.Name], DBNull.Value))
+                                { item.SetValue(obj, result[item.Name], null); }
+                            }//next item
+                            query.Add(obj);
+                        }//next    
+                        return query.AsQueryable();
+                    }//end using                
+                }//end using
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
         /*               
             private string getSQLStatement(sqlTypes type) {

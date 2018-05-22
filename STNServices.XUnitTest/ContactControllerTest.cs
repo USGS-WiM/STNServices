@@ -67,15 +67,16 @@ namespace STNServices.XUnitTest
 
         
         [Fact]
-        public async Task Put()
+        public async Task Put() //not working because loggedinmember == null. 
         {
             //Arrange
             var get = await controller.Get(1);
             var okgetResult = Assert.IsType<OkObjectResult>(get);
             var entity = Assert.IsType<contact>(okgetResult.Value);
             var newEntity = new contact();
-            newEntity.fname = "john";
-            newEntity.lname = "smith";
+            newEntity.fname = "Jane";
+            newEntity.lname = "Doe";
+
             //should test the equals Equatable for all these too
             var huh = entity.Equals(newEntity);
             //Act
@@ -85,9 +86,9 @@ namespace STNServices.XUnitTest
             var okResult = Assert.IsType<OkObjectResult>(response);
             var result = Assert.IsType<contact>(okResult.Value);
 
-            Assert.Equal(entity.fname, result.fname);
-            Assert.Equal(entity.lname, result.lname);
-            Assert.Equal(entity.email, result.email);
+            Assert.NotEqual(entity.fname, result.fname);
+            Assert.NotEqual(entity.lname, result.lname);
+            Assert.NotEqual(entity.email, result.email);
         }
 
         [Fact]

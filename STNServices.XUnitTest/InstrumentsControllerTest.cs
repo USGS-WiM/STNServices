@@ -112,7 +112,7 @@ namespace STNServices.XUnitTest
             var okResult = Assert.IsType<OkObjectResult>(response);
             var result = Assert.IsType<EnumerableQuery<instrument>>(okResult.Value);
 
-            Assert.Equal(1, result.Count());
+            Assert.Equal(2, result.Count());
             Assert.Equal(2, result.LastOrDefault().sensor_type_id);
             Assert.Equal(222, result.LastOrDefault().site_id);
         }

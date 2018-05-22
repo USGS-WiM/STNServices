@@ -65,7 +65,7 @@ namespace STNServices.XUnitTest
         }
 
         [Fact]
-        public async Task Post()
+        public async Task Post() //not working because loggedinmember == null. 
         {
             //Arrange
             var entity = new data_file() {
@@ -89,7 +89,7 @@ namespace STNServices.XUnitTest
         }
 
         [Fact]
-        public async Task Put()
+        public async Task Put() //not working because loggedinmember == null. 
         {
             //Arrange
             var get = await controller.Get(1);

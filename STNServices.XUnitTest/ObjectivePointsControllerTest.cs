@@ -126,7 +126,7 @@ namespace STNServices.XUnitTest
             var okResult = Assert.IsType<OkObjectResult>(response);
             var result = Assert.IsType<EnumerableQuery<objective_point>>(okResult.Value);
 
-            Assert.Equal(1, result.Count());
+            Assert.Equal(2, result.Count());
             Assert.Equal("SWaTH", result.LastOrDefault().name);
         }
     }
