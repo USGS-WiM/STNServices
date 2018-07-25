@@ -18,6 +18,7 @@ using WiM.Utilities.ServiceAgent;
 using WiM.Services.Middleware;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace STNServices
 {
@@ -96,6 +97,11 @@ namespace STNServices
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
             // global policy - assign here or on each controller
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+   
             app.UseAuthentication();
             app.UseCors("CorsPolicy");
             app.Use_Analytics();
