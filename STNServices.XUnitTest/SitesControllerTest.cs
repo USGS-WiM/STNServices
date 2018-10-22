@@ -70,7 +70,7 @@ namespace STNServices.XUnitTest
         public async Task Post()
         {
             //Arrange
-            var entity = new sites() { site_id = 5, site_no = "a3", site_name = "nameA1", site_description = "test12", state = "WI", county = "Fort", waterbody = "test", latitude_dd = 35, longitude_dd = -91, hdatum_id = 3, hcollect_method_id = 1, member_id = 44 };
+            var entity = new sites() { site_id = 5, site_no = "a3", site_name = "nameA1", site_description = "test12", state_fips = 5, county_fips = 71, waterbody = "test", latitude_dd = 35, longitude_dd = -91, hdatum_id = 3, hcollect_method_id = 1, member_id = 44 };
 
 
             //Act
@@ -92,7 +92,7 @@ namespace STNServices.XUnitTest
             var okgetResult = Assert.IsType<OkObjectResult>(get);
 
             var entity = Assert.IsType<sites>(okgetResult.Value);
-            var newEntity = new sites() { site_no = "A1", site_name = "name1", site_description = "test12", state = "WI", county = "Fort", waterbody = "test", latitude_dd = 34, longitude_dd = -90, hdatum_id = 3, hcollect_method_id = 1, member_id = 44 };
+            var newEntity = new sites() { site_no = "A1", site_name = "name1", site_description = "test12", state_fips = 55, county_fips = 71, waterbody = "test", latitude_dd = 34, longitude_dd = -90, hdatum_id = 3, hcollect_method_id = 1, member_id = 44 };
             
             //should test the equals Equatable for all these too
             var huh = entity.Equals(newEntity);
@@ -134,8 +134,8 @@ namespace STNServices.XUnitTest
         public InMemorySitesAgent() {
            this.entityList = new List<sites>()
            {
-               new sites() { site_id = 1, site_no= "a1", site_name = "name1", site_description = "test12", state = "WI", county = "Fort", waterbody = "test", latitude_dd = 34, longitude_dd = -90, hdatum_id = 3, hcollect_method_id = 1, member_id = 44},
-               new sites() { site_id = 2, site_no= "a2", site_name = "name2", site_description= "test23", state = "MN", county = "Scott", waterbody = "test1", latitude_dd = 45,  longitude_dd = -88, hdatum_id = 2, hcollect_method_id = 1, member_id = 22 }
+               new sites() { site_id = 1, site_no= "a1", site_name = "name1", site_description = "test12", state_fips = 55, county_fips = 71, waterbody = "test", latitude_dd = 34, longitude_dd = -90, hdatum_id = 3, hcollect_method_id = 1, member_id = 44},
+               new sites() { site_id = 2, site_no= "a2", site_name = "name2", site_description= "test23", state_fips = 55, county_fips = 71, waterbody = "test1", latitude_dd = 45,  longitude_dd = -88, hdatum_id = 2, hcollect_method_id = 1, member_id = 22 }
 
            };                    
         }

@@ -39,12 +39,36 @@ namespace STNServices.Controllers
         
         #region GET
         [HttpGet]
-        public async Task<IActionResult> Get()
+        [HttpGet("/Events/{eventid}/[controller]")]
+        public async Task<IActionResult> Get(int? eventid = null)
         {
+
+            IQueryable query = null;
+
             try
             {
+
+                if (eventid.HasValue)
+                {
+                    query = agent.Select<sites>()
+                                .Include(c => c.county)
+                                .Include(s => s.hwms).Include(s => s.instruments)
+                                .Where(s => s.hwms.Any(h => h.event_id == eventid) || s.instruments.Any(i => i.event_id == eventid))
+                                .Select( ct => ct.county ).Distinct();
+                
+                
+                //query = agent.Select<county>().Join(
+                    //agent.Select<sites>()
+                    // .Include(s => s.hwms).Include(s => s.instruments)
+                    //  .Where(s => s.hwms.Any(h => h.event_id == eventid) || s.instruments.Any(i => i.event_id == eventid)),
+                    //    c => c.county_fip, s => s.county_fips, (cty, ste) =>  cty.state_fip).Distinct();              
+                } else
+                {
+                    query = agent.Select<county>();
+                }
+
                 //sm(agent.Messages);
-                return Ok(agent.Select<county>());
+                return Ok(query);
             }
             catch (Exception ex)
             {
@@ -69,14 +93,14 @@ namespace STNServices.Controllers
             }
         }
 
-        [HttpGet("/States/{stateId}/[controller]")]
-        public async Task<IActionResult> GetStateCounties(int stateId)
+        [HttpGet("/States/{statefips}/[controller]")]
+        public async Task<IActionResult> GetStateCounties(int statefips)
         {
             try
             {
-                if (stateId < 0) return new BadRequestResult(); // This returns HTTP 404
+                if (statefips < 0) return new BadRequestResult(); // This returns HTTP 404
 
-                var objectsRequested = agent.Select<states>().Include(s=> s.counties).FirstOrDefault(x => x.state_id == stateId).counties;
+                var objectsRequested = agent.Select<states>().Include(s=> s.counties).FirstOrDefault(x => x.fips_code == statefips).counties;
                 if (objectsRequested == null) return new BadRequestObjectResult(new Error(errorEnum.e_notFound));
                 //sm(agent.Messages);
                 return Ok(objectsRequested);
@@ -114,13 +138,9 @@ namespace STNServices.Controllers
             try
             {
                 if (string.IsNullOrEmpty(StateAbbrev)) return new BadRequestResult();
-                var thisState = agent.Select<states>().FirstOrDefault(st => st.state_abbrev == StateAbbrev);
-                var allSitesInThisState = agent.Select<sites>().Where(s => s.state == StateAbbrev);
-                var uniqueCoList = allSitesInThisState.GroupBy(p => p.county).Select(g => g.FirstOrDefault()).Select(y => y.county);
-
-                var SiteCounties = agent.Select<county>().Where(co => uniqueCoList.Contains(co.county_name) && co.state_id == thisState.state_id);
+                var siteCounties = agent.Select<sites>().Include(st => st.state).Include(c => c.county).Where(s => s.state.state_abbrev == StateAbbrev).Select(s => s.county);
                 //sm(agent.Messages);
-                return Ok(SiteCounties);
+                return Ok(siteCounties);
             }
             catch (Exception ex)
             {

@@ -333,9 +333,10 @@ namespace STNServices.Controllers
                     .Include(f => f.hwm).ThenInclude(h => h.site)
                     .Include(f => f.instrument).ThenInclude(i => i.site)
                     .Include(f => f.data_file).ThenInclude(df => df.instrument).ThenInclude(i => i.site)
-                    .Where(f => f.hwm.site.state.ToUpper() == stateName.ToUpper() ||
-                           f.instrument.site.state.ToUpper() == stateName.ToUpper() ||
-                           f.data_file.instrument.site.state.ToUpper() == stateName.ToUpper());
+                    .Include("site.state")
+                    .Where(f => f.hwm.site.state.state_abbrev.ToUpper() == stateName.ToUpper() ||
+                           f.instrument.site.state.state_abbrev.ToUpper() == stateName.ToUpper() ||
+                           f.data_file.instrument.site.state.state_abbrev.ToUpper() == stateName.ToUpper());
 
                 if (objectsRequested == null) return new BadRequestObjectResult(new Error(errorEnum.e_notFound));
                 //sm(agent.Messages);

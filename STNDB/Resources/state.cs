@@ -18,7 +18,7 @@ namespace STNDB.Resources
         public states() {}
 
         [Key]
-        public int state_id { get; set; }
+        public int fips_code { get; set; }
         [Required]
         public string state_name { get; set; }
         [Required]

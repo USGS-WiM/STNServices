@@ -12,22 +12,19 @@ namespace STNDB.Resources
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
 
     public partial class county
     {
         public county() { }
 
         [Key]
-        public int county_id { get; set; }
-        [Required]//, RegularExpression()] // add Reg Exp to check that county name either ends with " Parish" or " County" , RegularExpression(@"\w * Id\b")] 
+        public Nullable<int> county_fip { get; set; }
+        [Required]
         public string county_name { get; set; }
         [Required]
-        public int state_id { get; set; }
-        [Required]
         public Nullable<int> state_fip { get; set; }
-        [Required]
-        public Nullable<int> county_fip { get; set; }
-    
+        [ForeignKey ("state_fip")]
         public virtual states states { get; set; }
     }
 }

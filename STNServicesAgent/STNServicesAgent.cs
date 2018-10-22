@@ -91,19 +91,19 @@ namespace STNAgent
                 Int32 filterEvent = (!string.IsNullOrEmpty(eventId)) ? Convert.ToInt32(eventId) : -1;
 
                 IQueryable<data_file> query;
+                query = this.Select<data_file>().Include(d => d.instrument).ThenInclude(i => i.site).ThenInclude(s => s.state).Include("instrument.site.county");
                 if (isApprovedStatus)
-                    query = this.Select<data_file>().Include(d => d.instrument).ThenInclude(i => i.site).Where(d => d.approval_id > 0);
+                    query = query.Where(d => d.approval_id > 0);
                 else
-                    query = this.Select<data_file>().Include(d => d.instrument).Where(d => d.approval_id <= 0 || !d.approval_id.HasValue);
-
+                    query = query.Where(d => d.approval_id <= 0 || !d.approval_id.HasValue);
                 if (filterEvent > 0)
                     query = query.Where(d => d.instrument.event_id.Value == filterEvent);
 
                 if (filterState != "")
-                    query = query.Where(d => d.instrument.site.state == filterState);
+                    query = query.Where(d => d.instrument.site.state.state_abbrev == filterState);
 
                 if (countyList != null && countyList.Count > 0)
-                    query = query.Where(d => countyList.Contains(d.instrument.site.county.ToUpper()));
+                    query = query.Where(d => countyList.Contains(d.instrument.site.county.county_name.ToUpper()));
 
                 sm(this.Messages);
                 return query.Select(d => new data_file()
@@ -138,7 +138,7 @@ namespace STNAgent
                 fromDate = ValidDate(date);
 
                 //get all events
-                query = this.Select<events>().Include(d => d.instruments).ThenInclude(i => i.site).Include(d => d.hwms).ThenInclude(h => h.site);
+                query = this.Select<events>().Include(d => d.instruments).ThenInclude(i => i.site).Include(d => d.hwms).ThenInclude(h => h.site).ThenInclude(st => st.state);
 
                 //events from this day forward
                 if (fromDate.HasValue)
@@ -154,7 +154,7 @@ namespace STNAgent
                 //in this state only
                 if (!string.IsNullOrEmpty(stateName))
                 {
-                    query = query.Where(e => e.instruments.Any(i => i.site.state == stateName.ToUpper()) || e.hwms.Any(h => h.site.state == stateName.ToUpper()));
+                    query = query.Where(e => e.instruments.Any(i => i.site.state.state_abbrev.ToUpper() == stateName.ToUpper()) || e.hwms.Any(h => h.site.state.state_abbrev.ToUpper() == stateName.ToUpper()));
                 }
                 return query.Distinct();
             }
@@ -183,7 +183,7 @@ namespace STNAgent
                 IQueryable<hwm> query;
                 query = this.Select<hwm>().Include(h => h.hwm_types).Include(h => h.@event).Include(h => h.hwm_qualities).Include(h => h.vertical_datums).Include(h => h.horizontal_datums).Include(h => h.survey_member)
                     .Include(h => h.flag_member).Include(h => h.vertical_collect_methods).Include(h => h.horizontal_collect_methods).Include(h => h.approval).ThenInclude(a=>a.members).Include(h => h.markers)
-                    .Include(h => h.site).ThenInclude(s=>s.deployment_priority).Include("site.network_name_site.network_name").Where(s => s.hwm_id > 0);
+                    .Include(h => h.site).ThenInclude(s=>s.deployment_priority).Include("site.network_name_site.network_name").Include("site.state").Include("site.county").Where(s => s.hwm_id > 0);
 
                 if (eventIdList != null && eventIdList.Count > 0)
                     query = query.Where(i => i.event_id.HasValue && eventIdList.Contains(i.event_id.Value));
@@ -200,10 +200,10 @@ namespace STNAgent
                     }
                 }
                 if (stateList != null && stateList.Count > 0)
-                    query = query.Where(i => stateList.Contains(i.site.state));
+                    query = query.Where(i => stateList.Contains(i.site.state.state_abbrev));
 
                 if (countyList != null && countyList.Count > 0)
-                    query = query.Where(i => countyList.Contains(i.site.county.ToUpper()));
+                    query = query.Where(i => countyList.Contains(i.site.county.county_name.ToUpper()));
 
                 if (hwmTypeIdList != null && hwmTypeIdList.Count > 0)
                     query = query.Where(i => hwmTypeIdList.Contains(i.hwm_type_id));
@@ -279,8 +279,8 @@ namespace STNAgent
                         site_longitude = hw.site != null ? hw.site.longitude_dd : 0,
                         siteDescription = hw.site != null ? hw.site.site_description : "",
                         networkNames = hw.site != null && hw.site.network_name_site.Count > 0 ? (hw.site.network_name_site.Where(ns => ns.site_id == hw.site.site_id).ToList()).Select(x => x.network_name.name).Distinct().Aggregate((x, j) => x + ", " + j) : "",
-                        stateName = hw.site != null ? hw.site.state : "",
-                        countyName = hw.site != null ? hw.site.county : "",
+                        stateName = hw.site != null ? hw.site.state.state_abbrev : "",
+                        countyName = hw.site != null ? hw.site.county.county_name : "",
                         sitePriorityName = hw.site != null && hw.site.priority_id > 0 && hw.site.deployment_priority != null ? hw.site.deployment_priority.priority_name : "",
                         siteZone = hw.site != null ? hw.site.zone : "",
                         sitePermHousing = hw.site != null && hw.site.is_permanent_housing_installed == null || hw.site.is_permanent_housing_installed == "No" ? "No" : "Yes"
@@ -319,10 +319,11 @@ namespace STNAgent
                 IQueryable<sites> query;
                 query = this.Select<sites>()
                     .Include(s => s.instruments).ThenInclude(i => i.@event)
-                    .Include(s=> s.hwms).ThenInclude(h=>h.@event)
-                    .Include(s=> s.objective_points)
-                    .Include(s => s.network_name_site).ThenInclude(nn=>nn.network_name)
-                    .Include(s => s.site_housing);
+                    .Include(s => s.hwms).ThenInclude(h => h.@event)
+                    .Include(s => s.objective_points)
+                    .Include(s => s.network_name_site).ThenInclude(nn => nn.network_name)
+                    .Include(s => s.site_housing)
+                    .Include(s => s.state);
 
                 if (filterEvent > 0)
                     query = query.Where(s => s.instruments.Any(i => i.event_id == filterEvent) || s.hwms.Any(h => h.event_id == filterEvent));
@@ -330,12 +331,12 @@ namespace STNAgent
                 if (states.Count >= 2)
                 {
                     //multiple STATES
-                    query = from q in query where states.Any(s => q.state.Contains(s.Trim())) select q;
+                    query = from q in query where states.Any(s => q.state.state_abbrev.Contains(s.Trim())) select q;
                 }
                 if (states.Count == 1)
                 {
                     string thisState = states[0];                    
-                    query = query.Where(r => r.state.Equals(thisState, StringComparison.OrdinalIgnoreCase));
+                    query = query.Where(r => r.state.state_abbrev.Equals(thisState, StringComparison.OrdinalIgnoreCase));
                 }
                 if (OPhasBeenDefined)
                     query = query.Where(s => s.objective_points.Any());
@@ -437,7 +438,9 @@ namespace STNAgent
                     .Include(i => i.site).ThenInclude(s=> s.deployment_priority)
                     .Include(i => i.site).ThenInclude(s => s.horizontal_datums)
                     .Include(i => i.site).ThenInclude(s => s.horizontal_collect_methods)
-                    .Include(i => i.site).ThenInclude(s => s.network_name_site).ThenInclude(nns=> nns.network_name)                    
+                    .Include(i => i.site).ThenInclude(s => s.network_name_site).ThenInclude(nns=> nns.network_name)
+                    .Include("site.state")
+                    .Include("site.county")
                     .Where(s => s.instrument_id > 0);
 
                 if (eventIdList != null && eventIdList.Count > 0)
@@ -455,10 +458,10 @@ namespace STNAgent
                     }
                 }
                 if (stateList != null && stateList.Count > 0)
-                    query = query.Where(i => stateList.Contains(i.site.state));
+                    query = query.Where(i => stateList.Contains(i.site.state.state_abbrev));
 
                 if (countyList != null && countyList.Count > 0)
-                    query = query.Where(i => countyList.Contains(i.site.county));
+                    query = query.Where(i => countyList.Contains(i.site.county.county_name));
 
                 if (collectionConditionIdList != null && collectionConditionIdList.Count > 0)
                     query = query.Where(i => i.inst_collection_id.HasValue && collectionConditionIdList.Contains(i.inst_collection_id.Value));
@@ -498,8 +501,8 @@ namespace STNAgent
                             longitude = inst.site.longitude_dd,
                             siteDescription = inst.site.site_description,
                             networkNames = inst.site.network_name_site.Count > 0 ? (inst.site.network_name_site.Where(ns => ns.site_id == inst.site.site_id).ToList()).Select(x => x.network_name.name).Distinct().Aggregate((x, j) => x + ", " + j) : "",
-                            stateName = inst.site.state,
-                            countyName = inst.site.county,
+                            stateName = inst.site.state.state_abbrev,
+                            countyName = inst.site.county.county_name,
                             siteWaterbody = inst.site.waterbody,
                             siteHDatum = inst.site.horizontal_datums != null ? inst.site.horizontal_datums.datum_name : "",
                             sitePriorityName = inst.site.deployment_priority != null ? inst.site.deployment_priority.priority_name : "",
@@ -536,7 +539,7 @@ namespace STNAgent
                 IQueryable<peak_summary> query;
                 query = this.Select<peak_summary>().Include(p => p.hwms).ThenInclude(h=> h.site).ThenInclude(s=> s.network_name_site).ThenInclude(nns=> nns.network_name)
                     .Include(p=> p.data_file).ThenInclude(d => d.instrument).ThenInclude(i=> i.site).ThenInclude(s => s.network_name_site).ThenInclude(nns => nns.network_name)
-                    .Include(p => p.vertical_datums).Include(p => p.members).Where(s => s.peak_summary_id > 0);
+                    .Include(p => p.vertical_datums).Include(p => p.members).Include("site.state").Include("site.county").Where(s => s.peak_summary_id > 0);
 
                 if (eventIdList != null && eventIdList.Count > 0)
                     query = query.Where(ps => (ps.hwms.Any(hwm => eventIdList.Contains(hwm.event_id.Value)) || (ps.data_file.Any(d => eventIdList.Contains(d.instrument.event_id.Value)))));
@@ -554,10 +557,10 @@ namespace STNAgent
                 }
 
                 if (stateList != null && stateList.Count > 0)
-                    query = query.Where(ps => (ps.hwms.Any(hwm => stateList.Contains(hwm.site.state)) || (ps.data_file.Any(d => stateList.Contains(d.instrument.site.state)))));
+                    query = query.Where(ps => (ps.hwms.Any(hwm => stateList.Contains(hwm.site.state.state_abbrev)) || (ps.data_file.Any(d => stateList.Contains(d.instrument.site.state.state_name)))));
 
                 if (countyList != null && countyList.Count > 0)
-                    query = query.Where(ps => (ps.hwms.Any(hwm => countyList.Contains(hwm.site.county)) || (ps.data_file.Any(d => countyList.Contains(d.instrument.site.county)))));
+                    query = query.Where(ps => (ps.hwms.Any(hwm => countyList.Contains(hwm.site.county.county_name)) || (ps.data_file.Any(d => countyList.Contains(d.instrument.site.county.county_name)))));
 
                 if (FromDate.HasValue)
                     query = query.Where(ps => ps.peak_date >= FromDate);
@@ -592,8 +595,8 @@ namespace STNAgent
                         longitude_dd = globalPeakSite.longitude_dd,
                         description = globalPeakSite.site_description,
                         networks = globalPeakSite.network_name_site.Count > 0 ? globalPeakSite.network_name_site.Select(x => x.network_name.name).Distinct().Aggregate((x, j) => x + ", " + j) : "",
-                        state = globalPeakSite.state,
-                        county = globalPeakSite.county,
+                        state = globalPeakSite.state.state_abbrev,
+                        county = globalPeakSite.county.county_name,
                         waterbody = globalPeakSite.waterbody,
                         horizontal_datum = globalPeakSite.horizontal_datums != null ? globalPeakSite.horizontal_datums.datum_name : "",
                         priority = globalPeakSite.deployment_priority != null ? globalPeakSite.deployment_priority.priority_name : "",

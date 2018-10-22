@@ -133,8 +133,8 @@ namespace STNServices.XUnitTest
         public InMemoryStatesAgent() {
            this.entityList = new List<states>()
            {
-               new states() { state_id = 1, state_abbrev= "WI", state_name = "Wisconsin" },
-               new states() { state_id = 2, state_abbrev= "MN", state_name = "Minnesota"  }
+               new states() { fips_code = 1, state_abbrev= "WI", state_name = "Wisconsin" },
+               new states() { fips_code = 2, state_abbrev= "MN", state_name = "Minnesota"  }
            };                 
         }
 
@@ -149,7 +149,7 @@ namespace STNServices.XUnitTest
         public Task<T> Find<T>(int pk) where T : class, new()
         {
             if (typeof(T) == typeof(states))
-                return Task.Run(()=> { return entityList.Find(i => i.state_id == pk) as T; });
+                return Task.Run(()=> { return entityList.Find(i => i.fips_code == pk) as T; });
 
             throw new Exception("not of correct type");
         }
@@ -176,8 +176,8 @@ namespace STNServices.XUnitTest
         {
             if (typeof(T) == typeof(states))
             {
-                var index = this.entityList.FindIndex(x => x.state_id == pkId);
-                (item as states).state_id = pkId;
+                var index = this.entityList.FindIndex(x => x.fips_code == pkId);
+                (item as states).fips_code = pkId;
                 this.entityList[index] = item as states;
                 return Task.Run(() => { return this.entityList[index] as T; });
             }

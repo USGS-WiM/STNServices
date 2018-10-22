@@ -143,7 +143,7 @@ namespace STNServices.Controllers
             {
                 if (string.IsNullOrEmpty(stateAbbrev)) return new BadRequestResult();
 
-                var objectRequested = agent.Select<sites>().Where(s => s.state.ToUpper() == stateAbbrev.ToUpper());
+                var objectRequested = agent.Select<sites>().Include(st => st.state).Where(s => s.state.state_abbrev.ToUpper() == stateAbbrev.ToUpper());
 
                 if (objectRequested == null) return new BadRequestObjectResult(new Error(errorEnum.e_notFound));
                 //sm(agent.Messages);
@@ -425,8 +425,8 @@ namespace STNServices.Controllers
                 entity.last_updated_by = loggedInMember.member_id;
 
                 sites postedSite = await agent.Add<sites>(entity);
-
-                postedSite.site_no = buildSiteNO(agent, postedSite.state, postedSite.county, Convert.ToInt32(postedSite.site_id), postedSite.site_name);
+                var state = agent.Select<states>().Include(c => c.counties).FirstOrDefault(s => s.fips_code == postedSite.state_fips);
+                postedSite.site_no = buildSiteNO(agent, state.state_abbrev, state.counties.FirstOrDefault(c => c.county_fip == postedSite.county_fips).county_name, Convert.ToInt32(postedSite.site_id), postedSite.site_name);
                 //if siteName contains historic name (with dashes) leave it as is..coming from uploader.. else assign the no to the name too
                 postedSite.site_name = string.IsNullOrEmpty(postedSite.site_name) ? postedSite.site_no : postedSite.site_name;
 
@@ -501,8 +501,12 @@ namespace STNServices.Controllers
                 if (query.Count > 1)
                     return new BadRequestObjectResult("Lat/Long already exists");
                 var updatedSite = agent.Select<sites>().FirstOrDefault(s => s.site_id == entity.site_id);
-                if ((!string.Equals(entity.state.ToUpper(), updatedSite.state.ToUpper())) || (!string.Equals(entity.county.ToUpper(), updatedSite.county.ToUpper())))
-                    entity.site_no = buildSiteNO(agent, entity.state, entity.county, Convert.ToInt32(entity.site_id), entity.site_name);
+
+                var state = agent.Select<states>().Include(c => c.counties).FirstOrDefault(s => s.fips_code == entity.state_fips);
+                entity.site_no = buildSiteNO(agent, state.state_abbrev, state.counties.FirstOrDefault(c => c.county_fip == entity.county_fips).county_name, Convert.ToInt32(entity.site_id), entity.site_name);
+
+                //if ((!string.Equals(entity.state.ToUpper(), updatedSite.state.ToUpper())) || (!string.Equals(entity.county.ToUpper(), updatedSite.county.ToUpper())))
+                //    entity.site_no = buildSiteNO(agent, entity.state, entity.county, Convert.ToInt32(entity.site_id), entity.site_name);
 
                 updatedSite.site_no = entity.site_no;
                 updatedSite.site_name = entity.site_name;

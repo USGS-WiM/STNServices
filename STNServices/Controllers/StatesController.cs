@@ -75,14 +75,16 @@ namespace STNServices.Controllers
         {
             try
             {
-                IQueryable<sites> siteList = agent.Select<sites>();
-                var uniqueSites = siteList.GroupBy(p => p.state).Select(g => g.FirstOrDefault()).Select(x => x.state);
-                var objectsRequested = agent.Select<states>().Where(e => uniqueSites.Contains(e.state_abbrev));
+                var siteList = agent.Select<sites>().Include(s => s.state).Select(st => st.state).Distinct();
+                
+                
+                //var uniqueSites = siteList.GroupBy(p => p.state).Select(g => g.FirstOrDefault()).Select(x => x.state);
+               // var objectsRequested = agent.Select<states>().Where(e => uniqueSites.Contains(e.state_abbrev));
                                 
-                if (objectsRequested == null) return new BadRequestObjectResult(new Error(errorEnum.e_notFound)); 
+                if (siteList == null) return new BadRequestObjectResult(new Error(errorEnum.e_notFound)); 
 
                 //sm(agent.Messages);
-                return Ok(objectsRequested);
+                return Ok(siteList);
             }
             catch (Exception ex)
             {

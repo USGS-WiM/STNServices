@@ -101,7 +101,7 @@ namespace STNServices.Controllers
                 if (filterEvent > 0)
                     query = query.Where(h => h.event_id == filterEvent);
                 if (State != "")
-                    query = query.Where(h => h.site.state.ToUpper() == State.ToUpper());
+                    query = query.Include("site.state").Where(h => h.site.state.state_abbrev.ToUpper() == State.ToUpper());
 
                 if (query == null) return new BadRequestObjectResult(new Error(errorEnum.e_notFound));
                 //sm(agent.Messages);
@@ -149,20 +149,20 @@ namespace STNServices.Controllers
                 string filterState = State;
                 List<String> countyList = !string.IsNullOrEmpty(Counties) ? Counties.ToUpper().Split(countydelimiterChars, StringSplitOptions.RemoveEmptyEntries).ToList() : null;
                 Int32 filterEvent = (!string.IsNullOrEmpty(Event)) ? Convert.ToInt32(Event) : -1;
-                IQueryable<hwm> query;
+                IQueryable<hwm> query = agent.Select<hwm>().Include(h => h.site).Include("site.state").Include("site.county");
                 if (isApprovedStatus)
-                    query = agent.Select<hwm>().Include(h => h.site).Where(h => h.approval_id > 0);                
+                    query = query.Where(h => h.approval_id > 0);                
                 else
-                    query = agent.Select<hwm>().Include(h => h.site).Where(h => h.approval_id <= 0 || !h.approval_id.HasValue);
+                    query = query.Where(h => h.approval_id <= 0 || !h.approval_id.HasValue);
 
                 if (filterEvent > 0)
                     query = query.Where(h => h.event_id == filterEvent);
 
                 if (filterState != "")
-                    query = query.Where(h => h.site.state == filterState);
+                    query = query.Where(h => h.site.state.state_abbrev == filterState);
 
                 if (countyList != null && countyList.Count > 0)
-                    query = query.Where(h => countyList.Contains(h.site.county.ToUpper()));
+                    query = query.Where(h => countyList.Contains(h.site.county.county_name.ToUpper()));
 
                 entities = query.AsEnumerable().ToList();
 

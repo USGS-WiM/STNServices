@@ -118,7 +118,7 @@ namespace STNDB.Resources
         public bool Equals(county other)
         {
             return String.Equals(this.county_name.ToLower(), other.county_name.ToLower()) &&
-                this.state_id == other.state_id && this.state_fip == other.state_fip &&
+                this.state_fip == other.state_fip && this.state_fip == other.state_fip &&
                 this.county_fip == other.county_fip;
         }
         public override bool Equals(object obj)
@@ -130,7 +130,7 @@ namespace STNDB.Resources
         }
         public override int GetHashCode()
         {
-            return (this.county_name + this.state_id + this.state_fip + this.county_fip).GetHashCode();
+            return (this.county_name + this.state_fip + this.state_fip + this.county_fip).GetHashCode();
         }
     }
     public partial class data_file : IEquatable<data_file>
@@ -883,10 +883,10 @@ namespace STNDB.Resources
                 String.Equals(this.site_description.ToLower(), other.site_description.ToLower()) &&
                 (this.address?.ToLower() ?? "") == (other.address?.ToLower() ?? "") &&
                 (this.city?.ToLower() ?? "") == (other.city?.ToLower() ?? "") &&
-                (this.state?.ToLower() ?? "") == (other.state?.ToLower() ?? "") &&
+                (this.state_fips) == (other.state_fips) &&
                 (this.zip?.ToLower() ?? "") == (other.zip?.ToLower() ?? "") && 
                 (this.other_sid?.ToLower() ?? "") == (other.other_sid?.ToLower() ?? "") &&
-                (this.county?.ToLower() ?? "") == (other.county?.ToLower() ?? "") &&
+                (this.county_fips == (other.county_fips)) &&
                 String.Equals(this.waterbody.ToLower(), other.waterbody.ToLower()) &&
                 this.latitude_dd == other.latitude_dd && this.longitude_dd == other.longitude_dd &&
                 this.hdatum_id == other.hdatum_id && this.drainage_area_sqmi == other.drainage_area_sqmi &&

@@ -29,11 +29,11 @@ namespace STNDB.Resources
         public string address { get; set; }
         public string city { get; set; }
         [Required]
-        public string state { get; set; }
+        public Int32 state_fips { get; set; }
         public string zip { get; set; }
         public string other_sid { get; set; }
         [Required]
-        public string county { get; set; }
+        public Int32 county_fips { get; set; }
         [Required]
         public string waterbody { get; set; }
         [Required]
@@ -67,6 +67,10 @@ namespace STNDB.Resources
         [ForeignKey("hdatum_id")]
         public virtual horizontal_datums horizontal_datums { get; set; }
         public virtual deployment_priority deployment_priority { get; set; }
+        [ForeignKey("county_fips")]
+        public virtual county county { get; set; }
+        [ForeignKey("state_fips")]
+        public virtual states state { get; set; }
         [ForeignKey("landownercontact_id")]
         public virtual landownercontact landownercontact { get; set; }
         public virtual horizontal_collect_methods horizontal_collect_methods { get; set; }

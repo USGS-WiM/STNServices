@@ -68,7 +68,7 @@ namespace STNServices.XUnitTest
         public async Task Post()
         {
             //Arrange
-            var entity = new county() { county_name = "Barbour County", state_id = 1, state_fip = 1, county_fip = 5 };
+            var entity = new county() { county_name = "Barbour County", state_fip = 1, county_fip = 5 };
    
             //Act
             var response = await controller.Post(entity);
@@ -128,8 +128,8 @@ namespace STNServices.XUnitTest
         public InMemoryCountiesAgent() {
            this.entityList = new List<county>()
            {
-               new county() { county_id=1, county_name= "Autauga County", state_id = 1, state_fip = 1, county_fip = 1 },
-               new county() { county_id=2, county_name= "Baldwin County", state_id = 1, state_fip = 1, county_fip = 3  }
+               new county() { county_fip=1, county_name= "Autauga County", state_fip = 1 },
+               new county() { county_fip=2, county_name= "Baldwin County",  state_fip = 1 }
            };                 
         }
 
@@ -144,7 +144,7 @@ namespace STNServices.XUnitTest
         public Task<T> Find<T>(int pk) where T : class, new()
         {
             if (typeof(T) == typeof(county))
-                return Task.Run(()=> { return entityList.Find(i => i.county_id == pk) as T; });
+                return Task.Run(()=> { return entityList.Find(i => i.county_fip == pk) as T; });
 
             throw new Exception("not of correct type");
         }
@@ -171,8 +171,8 @@ namespace STNServices.XUnitTest
         {
             if (typeof(T) == typeof(county))
             {
-                var index = this.entityList.FindIndex(x => x.county_id == pkId);
-                (item as county).county_id = pkId;
+                var index = this.entityList.FindIndex(x => x.county_fip == pkId);
+                (item as county).county_fip = pkId;
                 this.entityList[index] = item as county;
                 return Task.Run(() => { return this.entityList[index] as T; });
             }
