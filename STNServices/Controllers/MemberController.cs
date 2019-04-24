@@ -88,7 +88,7 @@ namespace STNServices.Controllers
             }
         }
 
-        [HttpGet("login")]
+        [HttpGet("/Login")]
         [Authorize(Policy = "CanModify")]
         public async Task<IActionResult> GetLoggedUser()
         {

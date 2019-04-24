@@ -44,7 +44,7 @@ namespace STNServices.Controllers
             try
             {
                 //sm(agent.Messages);
-                return Ok(agent.Select<markers>());
+                return Ok(agent.Select<markers>().OrderBy(e => e.marker_id).ToArray());
             }
             catch (Exception ex)
             {

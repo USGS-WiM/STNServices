@@ -72,7 +72,7 @@ namespace STNServices.Controllers
 
         // TODO ::: THIS DOESNT WORK //////
         //SensorViews?ViewType={view}&Event={eventIds}&EventType={eventTypeIDs}&EventStatus={eventStatusID}&States={states}&County={counties}&CurrentStatus={statusIDs}&CollectionCondition={collectionConditionIDs}&SensorType={sensorTypeIDs}&DeploymentType={deploymentTypeIDs}").Named("GetSensorViews")
-        [HttpGet("SensorViews")]
+        [HttpGet("/SensorViews")]
         public async Task<IActionResult> GetSensorViews([FromQuery] string ViewType, [FromQuery] string Event = "", [FromQuery] string EventType = "", [FromQuery] string EventStatus = "", [FromQuery] string States = "", [FromQuery] string County = "", [FromQuery] string CurrentStatus = "", [FromQuery] string CollectionCondition = "", [FromQuery] string SensorType = "", [FromQuery] string DeploymentType = "")
         {
             try
@@ -200,7 +200,7 @@ namespace STNServices.Controllers
                         vdatum_id = i.vdatum_id,
                         vdatum = i.vdatum_id.HasValue && i.vdatum_id > 0 ? i.vertical_datums.datum_name : ""
                     }).ToList<instrument_status>()
-                }).FirstOrDefault());
+                }).ToList());
             }
             catch (Exception ex)
             {
