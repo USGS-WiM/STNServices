@@ -156,7 +156,7 @@ namespace STNServices.Controllers
             }
         }
 
-        [HttpGet("ByDistance")] //?Latitude={latitude}&Longitude={longitude}&Buffer={buffer}
+        [HttpGet("/ByDistance")] //?Latitude={latitude}&Longitude={longitude}&Buffer={buffer}
         public async Task<IActionResult> GetSitesByLatLong([FromQuery] double Latitude, [FromQuery] double Longitude, [FromQuery] double Buffer)
         {
             try
@@ -164,7 +164,7 @@ namespace STNServices.Controllers
                 if (Latitude <= 0 || Longitude >= 0) return new BadRequestResult();
 
                 var objectRequested = agent.Select<sites>().Where(s => (s.latitude_dd >= Latitude - Buffer && s.latitude_dd <= Latitude + Buffer) &&
-                                                            (s.longitude_dd >= Longitude - Buffer && s.longitude_dd <= Longitude + Buffer));
+                                                            (s.longitude_dd >= Longitude - Buffer && s.longitude_dd <= Longitude + Buffer)).ToList();
 
                 if (objectRequested == null) return new BadRequestObjectResult(new Error(errorEnum.e_notFound));
                 //sm(agent.Messages);
