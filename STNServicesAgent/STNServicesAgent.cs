@@ -31,6 +31,8 @@ using System.Threading.Tasks;
 using WiM.Security.Authentication.Basic;
 using WiM.Resources;
 using System.Reflection;
+using System.IO;
+using Amazon.S3;
 
 namespace STNAgent
 {
@@ -855,12 +857,12 @@ namespace STNAgent
 
         #endregion
 
-        #region s3 bucket stuff
-      /*  public FileStream GetFileItem(file afile)
+        #region s3 bucket stuff TODO
+        public FileStream GetFileItem(file afile)
         {
             
-            //file aFile = null;
-            //S3Bucket aBucket = null;
+            file aFile = null;
+            IAmazonS3 aBucket = null;
             aBucket = null;
             FileStream fileItem = null;
             try
@@ -868,7 +870,7 @@ namespace STNAgent
                 if (afile == null || afile.path == null || String.IsNullOrEmpty(afile.path)) throw new WiM.Exceptions.NotFoundRequestException();
 
                 string directoryName = string.Empty;
-                aBucket = new S3Bucket(Configuration.AppSettings["AWSBucket"], ConfigurationManager.AppSettings["AWSAccessKey"],
+                aBucket = new IAmazonS3(Configuration.AppSettings["AWSBucket"], ConfigurationManager.AppSettings["AWSAccessKey"],
                                         ConfigurationManager.AppSettings["AWSSecretKey"]);
                 directoryName = afile.path + "/" + afile.name;
                 var fileStream = aBucket.GetObject(directoryName);
@@ -885,7 +887,7 @@ namespace STNAgent
                 sm(WiM.Resources.MessageType.error, "Failed to include item: " + afile.path + " exception: " + ex.Message);
                 throw;
             }
-        }*/
+        }
         /*
              internal InMemoryFile GetHWMSpreadsheetItem()
             {
