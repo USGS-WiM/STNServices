@@ -46,7 +46,7 @@ namespace STNAgent
         IBasicUser GetUserByUsername(string username);
         IQueryable<data_file> GetFilterDataFiles(string approved, string eventId, string state, string counties);
         IQueryable<T> getTable<T>(object[] args) where T : class, new();
-        IQueryable<events> GetFiltedEvents(string date, string eventTypeId, string stateName);
+        IQueryable<events> GetFilteredEvents(string date, string eventTypeId, string stateName);
         DateTime? ValidDate(string date);
         List<hwm> GetFilterHWMs(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string hwmTypeIDs, string hwmQualIDs, string hwmEnvironment, string surveyComplete, string stillWater);
         List<instrument> GetFiltedInstruments(string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType);
@@ -129,7 +129,7 @@ namespace STNAgent
             }
         }
 
-        public IQueryable<events> GetFiltedEvents(string date, string eventTypeId, string stateName)
+        public IQueryable<events> GetFilteredEvents(string date, string eventTypeId, string stateName)
         {
             IQueryable<events> query;
             List<events> entities = new List<events>();
@@ -157,7 +157,35 @@ namespace STNAgent
                 {
                     query = query.Where(e => e.instruments.Any(i => i.site.state == stateName.ToUpper()) || e.hwms.Any(h => h.site.state == stateName.ToUpper()));
                 }
-                return query.Distinct();
+
+                return query.Distinct().Select(ev => new events
+                {
+                    event_id = ev.event_id,
+                    event_name = ev.event_name,
+                    event_start_date = ev.event_start_date,
+                    event_end_date = ev.event_end_date,
+                    event_description = ev.event_description,
+                    event_type_id = ev.event_type_id,
+                    event_status_id = ev.event_status_id,
+                    event_coordinator = ev.event_coordinator
+                });
+
+                //entities = query.Distinct().ToList();
+
+                /*entities = entities.Select(ev => new events
+                {
+                    event_id = ev.event_id,
+                    event_name = ev.event_name,
+                    event_start_date = ev.event_start_date,
+                    event_end_date = ev.event_end_date,
+                    event_description = ev.event_description,
+                    event_type_id = ev.event_type_id,
+                    event_status_id = ev.event_status_id,
+                    event_coordinator = ev.event_coordinator
+                }).ToList();*/
+
+                //return entities;
+
             }
             catch (Exception ex)
             {

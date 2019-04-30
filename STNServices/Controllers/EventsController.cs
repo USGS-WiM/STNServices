@@ -182,7 +182,7 @@ namespace STNServices.Controllers
             try
             {
                 //sm(agent.Messages);
-                return Ok(agent.GetFiltedEvents(Date, Type, State));
+                return Ok(agent.GetFilteredEvents(Date, Type, State));
             }
             catch (Exception ex)
             {
