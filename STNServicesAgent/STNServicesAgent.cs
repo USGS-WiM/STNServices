@@ -49,7 +49,7 @@ namespace STNAgent
         IQueryable<events> GetFilteredEvents(string date, string eventTypeId, string stateName);
         DateTime? ValidDate(string date);
         List<hwm> GetFilterHWMs(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string hwmTypeIDs, string hwmQualIDs, string hwmEnvironment, string surveyComplete, string stillWater);
-        List<instrument> GetFiltedInstruments(string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType);
+        List<instrument> GetFilteredInstruments(string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType);
         List<peak_summary> GetFiltedPeaks(string ev, string eventType, string eventStatus, string states, string county, string startDate, string endDate);
     //    FileStream GetFileItem(file anEntity);
         List<sites> GetFilterSites(string @event, string state, string sensorType, string networkName, string oPDefined, string hWMOnly, string hWMSurveyed, string sensorOnly, string rDGOnly);
@@ -444,7 +444,7 @@ namespace STNAgent
             }
         }
         
-        public List<instrument> GetFiltedInstruments(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string statusIDs, string collectionConditionIDs, string sensorTypeIDs, string deploymentTypeIDs)
+        public List<instrument> GetFilteredInstruments(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string statusIDs, string collectionConditionIDs, string sensorTypeIDs, string deploymentTypeIDs)
         {
             List<instrument> entities = null;
             try

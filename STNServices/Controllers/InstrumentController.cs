@@ -410,7 +410,7 @@ namespace STNServices.Controllers
             try
             {
                 //sm(agent.Messages);
-                return Ok(agent.GetFiltedInstruments(Event, EventType, EventStatus, States, County, CurrentStatus, CollectionCondition, SensorType, DeploymentType));
+                return Ok(agent.GetFilteredInstruments(Event, EventType, EventStatus, States, County, CurrentStatus, CollectionCondition, SensorType, DeploymentType));
             }
             catch (Exception ex)
             {

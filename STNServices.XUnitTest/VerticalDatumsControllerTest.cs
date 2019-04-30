@@ -233,7 +233,7 @@ namespace STNServices.XUnitTest
             throw new NotImplementedException();
         }
 
-        public List<instrument> GetFiltedInstruments(string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType)
+        public List<instrument> GetFilteredInstruments(string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType)
         {
             throw new NotImplementedException();
         }
