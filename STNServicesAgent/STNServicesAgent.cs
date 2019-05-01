@@ -54,8 +54,8 @@ namespace STNAgent
         List<peak_summary> GetFilteredPeaks(string ev, string eventType, string eventStatus, string states, string county, string startDate, string endDate);
     //    FileStream GetFileItem(file anEntity);
         List<sites> GetFilterSites(string @event, string state, string sensorType, string networkName, string oPDefined, string hWMOnly, string hWMSurveyed, string sensorOnly, string rDGOnly);
-        List<ReportResource> GetFiltedReportsModel(int ev, string state, string date);
-        List<reporting_metrics> GetFiltedReports(string ev, string date, string states);
+        List<ReportResource> GetFilteredReportsModel(int ev, string state, string date);
+        List<reporting_metrics> GetFilteredReports(string ev, string date, string states);
         List<sensor_view> GetSensorView(string ViewType, string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType);
 
         //    InMemoryFile GetFileItem(file anEntity);
@@ -689,7 +689,7 @@ namespace STNAgent
             }
         }
 
-        public List<ReportResource> GetFiltedReportsModel(int eventId, string stateNames, string aDate)
+        public List<ReportResource> GetFilteredReportsModel(int eventId, string stateNames, string aDate)
         {
             List<ReportResource> ReportList = null;
             IQueryable<reporting_metrics> query = null;
@@ -805,7 +805,7 @@ namespace STNAgent
             }
         }
 
-        public List<reporting_metrics> GetFiltedReports(string eventId, string aDate, string stateNames)
+        public List<reporting_metrics> GetFilteredReports(string eventId, string aDate, string stateNames)
         {
             List<reporting_metrics> ReportList = null;
             IQueryable<reporting_metrics> query = null;

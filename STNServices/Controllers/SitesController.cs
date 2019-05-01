@@ -413,8 +413,9 @@ namespace STNServices.Controllers
         {
             try
             {
-                if (!isValid(entity)) return new BadRequestResult();
-
+                if (string.IsNullOrEmpty(entity.site_description) || entity.latitude_dd <= 0 || entity.longitude_dd >= 0 || entity.hdatum_id <= 0 ||
+                    entity.hcollect_method_id <= 0 || string.IsNullOrEmpty(entity.state) || string.IsNullOrEmpty(entity.county) ||
+                    string.IsNullOrEmpty(entity.waterbody) || (entity.member_id <= 0)) return new BadRequestResult();
                 //no duplicate lat/longs allowed
                 List<sites> query = agent.Select<sites>().Where(s => s.latitude_dd == entity.latitude_dd && s.longitude_dd == entity.longitude_dd).ToList();
                 if (query.Count > 0)
@@ -423,8 +424,12 @@ namespace STNServices.Controllers
                 if (loggedInMember == null) return new BadRequestObjectResult("Invalid input parameters");
                 entity.last_updated = DateTime.Now;
                 entity.last_updated_by = loggedInMember.member_id;
+                //var postedSite = new sites();
 
                 sites postedSite = await agent.Add<sites>(entity);
+
+                //postedSite = entity;
+                //await agent.Add<sites>(postedSite);
 
                 postedSite.site_no = buildSiteNO(agent, postedSite.state, postedSite.county, Convert.ToInt32(postedSite.site_id), postedSite.site_name);
                 //if siteName contains historic name (with dashes) leave it as is..coming from uploader.. else assign the no to the name too
