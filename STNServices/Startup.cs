@@ -19,6 +19,7 @@ using WiM.Services.Middleware;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.HttpOverrides;
+using Amazon.S3;
 
 namespace STNServices
 {
@@ -47,6 +48,9 @@ namespace STNServices
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IConfiguration>(Configuration);
+
+            var awsoptions = Configuration.GetAWSOptions();
+            IAmazonS3 client = awsoptions.CreateServiceClient<IAmazonS3>();
 
             services.AddScoped<IAnalyticsAgent, GoogleAnalyticsAgent>((gaa) => new GoogleAnalyticsAgent(Configuration["AnalyticsKey"]));
             // Add framework services.
@@ -83,10 +87,8 @@ namespace STNServices
                     .AddJsonOptions(options => loadJsonOptions(options));
 
             // https://aws.amazon.com/blogs/developer/configuring-aws-sdk-with-net-core/
-            //services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
-            //services.AddAWSService<IAmazonS3>(); // doesn't work
-
-            // services.AddAWSService<IAmazonDynamoDB>();
+            services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+            services.AddAWSService<IAmazonS3>(); // doesn't work
         }
 
      

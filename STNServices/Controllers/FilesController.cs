@@ -71,7 +71,7 @@ namespace STNServices.Controllers
         }
 
         //(fileResource+"/{id}/Item")
-      /*   [HttpGet("{id}/Item")]
+         [HttpGet("{id}/Item")]
          public async Task<IActionResult> GetFileItem(int id)
          {
              try
@@ -89,7 +89,7 @@ namespace STNServices.Controllers
                  //sm(agent.Messages);
                  return await HandleExceptionAsync(ex);
              }
-         }*/
+         }
 /*
          //(hwmResource + "/historicHWMspreadsheet")
          [HttpGet("HWMs/historicHWMspreadsheet")]
