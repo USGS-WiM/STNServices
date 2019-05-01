@@ -176,7 +176,7 @@ namespace STNServices.Controllers
                     return new BadRequestResult();
 
                 //sm(agent.Messages);
-                return Ok(agent.GetFiltedReports(Event, Date, States));
+                return Ok(agent.GetFilteredReports(Event, Date, States));
             }
             catch (Exception ex)
             {

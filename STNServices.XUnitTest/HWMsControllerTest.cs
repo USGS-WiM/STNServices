@@ -240,7 +240,7 @@ namespace STNServices.XUnitTest
             throw new NotImplementedException();
         }
 
-        public List<reporting_metrics> GetFiltedReports(string ev, string date, string states)
+        public List<reporting_metrics> GetFilteredReports(string ev, string date, string states)
         {
             throw new NotImplementedException();
         }
