@@ -239,7 +239,7 @@ namespace STNServices.XUnitTest
             throw new NotImplementedException();
         }
 
-        public List<ReportResource> GetFiltedReportsModel(int ev, string state, string date)
+        public List<ReportResource> GetFilteredReportsModel(int ev, string state, string date)
         {
             throw new NotImplementedException();
         }

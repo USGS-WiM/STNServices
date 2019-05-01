@@ -49,7 +49,7 @@ namespace STNAgent
         IQueryable<T> getTable<T>(object[] args) where T : class, new();
         IQueryable<events> GetFilteredEvents(string date, string eventTypeId, string stateName);
         DateTime? ValidDate(string date);
-        List<hwm> GetFilterHWMs(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string hwmTypeIDs, string hwmQualIDs, string hwmEnvironment, string surveyComplete, string stillWater);
+        List<hwm> GetFilteredHWMs(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string hwmTypeIDs, string hwmQualIDs, string hwmEnvironment, string surveyComplete, string stillWater);
         List<instrument> GetFilteredInstruments(string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType);
         List<peak_summary> GetFilteredPeaks(string ev, string eventType, string eventStatus, string states, string county, string startDate, string endDate);
     //    FileStream GetFileItem(file anEntity);
@@ -177,7 +177,7 @@ namespace STNAgent
             }
         }
 
-        public List<hwm> GetFilterHWMs(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string hwmTypeIDs, string hwmQualIDs, string hwmEnvironment, string surveyComplete, string stillWater)
+        public List<hwm> GetFilteredHWMs(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string hwmTypeIDs, string hwmQualIDs, string hwmEnvironment, string surveyComplete, string stillWater)
         {
             List<hwm> entities = null;
             try
