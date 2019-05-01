@@ -50,7 +50,7 @@ namespace STNAgent
         DateTime? ValidDate(string date);
         List<hwm> GetFilterHWMs(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string hwmTypeIDs, string hwmQualIDs, string hwmEnvironment, string surveyComplete, string stillWater);
         List<instrument> GetFilteredInstruments(string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType);
-        List<peak_summary> GetFiltedPeaks(string ev, string eventType, string eventStatus, string states, string county, string startDate, string endDate);
+        List<peak_summary> GetFilteredPeaks(string ev, string eventType, string eventStatus, string states, string county, string startDate, string endDate);
     //    FileStream GetFileItem(file anEntity);
         List<sites> GetFilterSites(string @event, string state, string sensorType, string networkName, string oPDefined, string hWMOnly, string hWMSurveyed, string sensorOnly, string rDGOnly);
         List<ReportResource> GetFiltedReportsModel(int ev, string state, string date);
@@ -169,23 +169,6 @@ namespace STNAgent
                     event_status_id = ev.event_status_id,
                     event_coordinator = ev.event_coordinator
                 });
-
-                //entities = query.Distinct().ToList();
-
-                /*entities = entities.Select(ev => new events
-                {
-                    event_id = ev.event_id,
-                    event_name = ev.event_name,
-                    event_start_date = ev.event_start_date,
-                    event_end_date = ev.event_end_date,
-                    event_description = ev.event_description,
-                    event_type_id = ev.event_type_id,
-                    event_status_id = ev.event_status_id,
-                    event_coordinator = ev.event_coordinator
-                }).ToList();*/
-
-                //return entities;
-
             }
             catch (Exception ex)
             {
@@ -545,7 +528,7 @@ namespace STNAgent
             }
         }
 
-        public List<peak_summary> GetFiltedPeaks(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string startDate, string endDate)
+        public List<peak_summary> GetFilteredPeaks(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string startDate, string endDate)
         {
             List<peak_summary> entities = null;
             try
