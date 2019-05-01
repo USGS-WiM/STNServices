@@ -205,7 +205,7 @@ namespace STNServices.XUnitTest
         {
             throw new NotImplementedException();
         }
-        public IQueryable<events> GetFiltedEvents(string date, string eventTypeId, string stateName)
+        public IQueryable<events> GetFilteredEvents(string date, string eventTypeId, string stateName)
         {
             throw new NotImplementedException();
         }
@@ -213,7 +213,7 @@ namespace STNServices.XUnitTest
         {
             throw new NotImplementedException();
         }
-        public List<hwm> GetFilterHWMs(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string hwmTypeIDs, string hwmQualIDs, string hwmEnvironment, string surveyComplete, string stillWater)
+        public List<hwm> GetFilteredHWMs(string eventIds, string eventTypeIDs, string eventStatusID, string states, string counties, string hwmTypeIDs, string hwmQualIDs, string hwmEnvironment, string surveyComplete, string stillWater)
         {
             throw new NotImplementedException();
         }

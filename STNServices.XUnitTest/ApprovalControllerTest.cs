@@ -160,7 +160,7 @@ namespace STNServices.XUnitTest
         {
             throw new NotImplementedException();
         }
-        public IQueryable<events> GetFiltedEvents(string date, string eventTypeId, string stateName)
+        public IQueryable<events> GetFilteredEvents(string date, string eventTypeId, string stateName)
         {
             throw new NotImplementedException();
         }

@@ -387,7 +387,7 @@ namespace STNServices.Controllers
             try
             {
                 //sm(agent.Messages);
-                return Ok(agent.GetFilterHWMs(Event, EventType, EventStatus, States, County, HWMType, HWMQuality, HWMEnvironment, SurveyComplete, StillWater));                
+                return Ok(agent.GetFilteredHWMs(Event, EventType, EventStatus, States, County, HWMType, HWMQuality, HWMEnvironment, SurveyComplete, StillWater));                
             }
             catch (Exception ex)
             {

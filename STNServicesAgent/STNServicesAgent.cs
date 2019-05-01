@@ -32,7 +32,6 @@ using WiM.Security.Authentication.Basic;
 using WiM.Resources;
 using System.Reflection;
 using System.IO;
-using Amazon.S3;
 
 namespace STNAgent
 {
@@ -869,7 +868,7 @@ namespace STNAgent
         #endregion
 
         #region s3 bucket stuff TODO
-        public FileStream GetFileItem(file afile)
+        /*public FileStream GetFileItem(file afile)
         {
             
             file aFile = null;
@@ -898,7 +897,7 @@ namespace STNAgent
                 sm(WiM.Resources.MessageType.error, "Failed to include item: " + afile.path + " exception: " + ex.Message);
                 throw;
             }
-        }
+        }*/
         /*
              internal InMemoryFile GetHWMSpreadsheetItem()
             {
