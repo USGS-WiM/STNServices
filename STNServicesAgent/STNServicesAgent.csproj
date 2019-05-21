@@ -5,9 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.3.5" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="WIM.Exceptions" Version="1.0.1" />
     <PackageReference Include="WiM.Resources" Version="1.1.1" />
+    <PackageReference Include="WIM.Storage" Version="1.0.4" />
   </ItemGroup>
 
   <ItemGroup>

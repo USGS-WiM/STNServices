@@ -30,8 +30,11 @@ using STNAgent.Resources;
 using System.Threading.Tasks;
 using WiM.Security.Authentication.Basic;
 using WiM.Resources;
+using WIM.Exceptions.Services;
 using System.Reflection;
 using System.IO;
+using WIM.Storage.AWS;
+using Microsoft.Extensions.Options;
 
 namespace STNAgent
 {
@@ -57,7 +60,7 @@ namespace STNAgent
         List<ReportResource> GetFilteredReportsModel(int ev, string state, string date);
         List<reporting_metrics> GetFilteredReports(string ev, string date, string states);
         List<sensor_view> GetSensorView(string ViewType, string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType);
-
+        Task<Stream> GetFileItem(int fileid);
         //    InMemoryFile GetFileItem(file anEntity);
         //    InMemoryFile GetHWMSpreadsheetItem();
 
@@ -65,18 +68,18 @@ namespace STNAgent
 
     public class STNServicesAgent : DBAgentBase, ISTNServicesAgent, IBasicUserAgent
     {
-        //https://aws.amazon.com/blogs/developer/configuring-aws-sdk-with-net-core/
-        Amazon.Runtime.IAmazonService aBucket { get; set; }
         //private Dictionary<string, string> Resources;
 
         //needed for peakDownloadable populating of related site
         private sites globalPeakSite = new sites();
+        private S3Bucket bucket { get; set; }
 
-        public STNServicesAgent(STNDBContext context):base(context){//, Dictionary<string, string> files) : base(context) {
-
+        public STNServicesAgent(STNDBContext context, IOptions<AWSSettings> settings) :base(context){//, Dictionary<string, string> files) : base(context) {
             //optimize query for disconnected databases.
             this.context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             //this.Resources = files;
+            if (settings != null)
+                this.bucket = new S3Bucket(settings.Value);
         }
 
         #region Filtered Returns
@@ -868,52 +871,87 @@ namespace STNAgent
         #endregion
 
         #region s3 bucket stuff TODO
-        /*public FileStream GetFileItem(file afile)
+        public async Task DeleteAWSObjectTestAsync(file fileToRemove)
         {
-            
-            file aFile = null;
-            IAmazonS3 aBucket = null;
-            aBucket = null;
-            FileStream fileItem = null;
             try
             {
-                if (afile == null || afile.path == null || String.IsNullOrEmpty(afile.path)) throw new WiM.Exceptions.NotFoundRequestException();
-
                 string directoryName = string.Empty;
-                aBucket = new IAmazonS3(Configuration.AppSettings["AWSBucket"], ConfigurationManager.AppSettings["AWSAccessKey"],
-                                        ConfigurationManager.AppSettings["AWSSecretKey"]);
-                directoryName = afile.path + "/" + afile.name;
-                var fileStream = aBucket.GetObject(directoryName);
+                directoryName = fileToRemove.path + "/" + fileToRemove.name;
+                await bucket.DeleteObject(directoryName);
+                sm(MessageType.info, fileToRemove.file_id + ": Deleted from storage");
+            }
+            catch (Exception ex)
+            {
+                sm(MessageType.error, fileToRemove.file_id + ":" + ex.Message);
+                throw;
+            }
+        }
+        public async Task AddObject(file uploadFile, MemoryStream memoryStream)
+        {
+            try
+            {
 
-                fileItem = new InMemoryFile(fileStream);
-                fileItem.ContentType = GetContentType(afile.name);
-                fileItem.Length = fileStream != null ? fileStream.Length : 0;
-                fileItem.FileName = afile.name;
-                return fileItem;
+                int eventId = 0;
+                if (uploadFile.hwm_id.HasValue && uploadFile.hwm_id > 0)
+                {
+                    eventId = this.Select<hwm>().FirstOrDefault(h => h.hwm_id == uploadFile.hwm_id).event_id.Value;
+                }
+                else if (uploadFile.instrument_id.HasValue && uploadFile.instrument_id > 0)
+                {
+                    eventId = this.Select<instrument>().FirstOrDefault(h => h.instrument_id == uploadFile.instrument_id).event_id.Value;
+                }
+                //Upload to S3
+                uploadFile.path = BuildNewpath(uploadFile, eventId);
 
+                await bucket.AddObject(uploadFile.path + "/" + uploadFile.name, memoryStream);
+
+                sm(MessageType.info, uploadFile.path + ": added");
+            }
+            catch (Exception ex)
+            {
+                sm(WiM.Resources.MessageType.error, "FileID: " + uploadFile.path + " exception: " + ex.Message);
+                throw;
+            }
+            finally
+            {
+                // if (bucket != null) { bucket.Dispose(); bucket = null; } // not sure if this is needed? S3Buckets doesn't have a dispose menthod
+            }
+        }
+        public async Task<Stream> GetFileItem(int fileid)
+        {
+            file afile = null;
+
+            try
+            {           
+                afile = await Find<file>(fileid);
+
+                if (afile == null || afile.path == null || String.IsNullOrEmpty(afile.path)) throw new NotFoundRequestException();
+
+                string directoryName = string.Empty;       
+                var item = await bucket.GetObject(afile.path + "/" + afile.name);
+
+                return item;
             }
             catch (Exception ex)
             {
                 sm(WiM.Resources.MessageType.error, "Failed to include item: " + afile.path + " exception: " + ex.Message);
                 throw;
             }
-        }*/
+        }
         /*
-             internal InMemoryFile GetHWMSpreadsheetItem()
+        public async Task<Stream> GetHWMSpreadsheetItem(int fileid)
             {
-                S3Bucket aBucket = null;
-                InMemoryFile fileItem = null;
-                try
+                file afile = null;
+            try
                 {
                     string directoryName = string.Empty;
-                    aBucket = new S3Bucket(ConfigurationManager.AppSettings["AWSBucket"], ConfigurationManager.AppSettings["AWSAccessKey"],
-                                            ConfigurationManager.AppSettings["AWSSecretKey"]);
+                    
                     directoryName = "cleanHistoricHWMUploadSpreadsheet.xlsx";
                     var fileStream = aBucket.GetObject(directoryName);
 
                     fileItem = new InMemoryFile(fileStream);
                     fileItem.ContentType = GetContentType(".XLSX");
-                   // fileItem.Length = fileStream != null ? fileStream.Length : 0;
+                    fileItem.Length = fileStream != null ? fileStream.Length : 0;
                     fileItem.FileName = "cleanHistoricHWMUploadSpreadsheet.xlsx";
                     return fileItem;
 
@@ -924,7 +962,8 @@ namespace STNAgent
                     throw;
                 }
             }
-         */
+            */
+        
         #endregion
 
         #region Universal
@@ -1085,6 +1124,38 @@ namespace STNAgent
                     throw new Exception("No sql for table " + type);
             }//end switch;
 
+        }
+        private static string BuildNewpath(file FileItem, decimal eventId)
+        {
+            //SITES
+            //  -SITE_123
+            //      *contains all site 123 specific files, such as site sketch etc, images etc. 
+            //EVENTS
+            //  -EVENT_123
+            //      -SITE_456
+            //          * contains all event 123 specific files for site 456, such as hwm, data, and image files etc.
+            try
+            {
+                List<string> objectName = new List<string>();
+                if (eventId > 0)
+                {
+                    // ../SITE/3043/HWM/7956/ex.jpg
+                    objectName.Add("EVENTS");
+                    objectName.Add("EVENT_" + eventId);
+                    objectName.Add("SITE_" + FileItem.site_id);
+                }
+                else
+                {
+                    objectName.Add("SITES");
+                    objectName.Add("SITE_" + FileItem.site_id);
+                }
+
+                return string.Join("/", objectName);
+            }
+            catch
+            {
+                return null;
+            }
         }
         public DateTime? ValidDate(string date)
         {

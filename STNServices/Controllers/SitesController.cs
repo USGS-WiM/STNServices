@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using STNDB.Resources;
 using STNAgent;
+using WIM.Storage.AWS;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,8 @@ using System.Linq;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Options;
+using WiM.Services.Resources;
 
 namespace STNServices.Controllers
 {
@@ -377,33 +380,37 @@ namespace STNServices.Controllers
             }
         }
         
-        [HttpGet("{entityId}/GetDataFileScript")]
-        public async Task<IActionResult> GetDataFileScript(int entityId)
-        {
-            try
-            {
-                string isRunning = "false";
-                if (entityId < 0) return new BadRequestResult();
-                string path1 = _config["STNRepository"].ToString();
-                string path2 = entityId.ToString();
-                string combinedPath = System.IO.Path.Combine(path1);
+        // No longer using Scripts in STNServices
+        //[HttpGet("{id}/GetDataFileScript")]
+        //public async Task<IActionResult> GetDataFileScript(int id)
+        //{
+        //    try
+        //    {
+        //        string isRunning = "false";
+        //        if (id < 0) return new BadRequestResult();
+        //        //string pathEntity = id.ToString();
+        //        //string pathCombined = Path.Combine(pathRepo);
+        //        string path1 = _config["AWSSettings:BucketName"].ToString();
+        //        //string path1 = _config["STNRepository"].ToString();
+        //        string path2 = id.ToString();
+        //        string combinedPath = System.IO.Path.Combine(path1);
 
-                string[] subdirs = Directory.GetDirectories(combinedPath, path2 + "*");
+        //        string[] subdirs = Directory.GetDirectories(combinedPath, path2 + "*");
 
-                if (subdirs.Length > 0)
-                    isRunning = "true";
-                else
-                    isRunning = "false";
+        //        if (subdirs.Length > 0)
+        //            isRunning = "true";
+        //        else
+        //            isRunning = "false";
 
-                //sm(agent.Messages);
-                return Ok(isRunning);
-            }
-            catch (Exception ex)
-            {
-                //sm(agent.Messages);
-                return await HandleExceptionAsync(ex);
-            }
-        }
+        //        //sm(agent.Messages);
+        //        return Ok(isRunning);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //sm(agent.Messages);
+        //        return await HandleExceptionAsync(ex);
+        //    }
+        //}
 
         #endregion
 

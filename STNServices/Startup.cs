@@ -19,7 +19,7 @@ using WiM.Services.Middleware;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.HttpOverrides;
-using Amazon.S3;
+using WIM.Storage.AWS;
 
 namespace STNServices
 {
@@ -48,10 +48,7 @@ namespace STNServices
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IConfiguration>(Configuration);
-
-            var awsoptions = Configuration.GetAWSOptions();
-            IAmazonS3 client = awsoptions.CreateServiceClient<IAmazonS3>();
-
+            
             services.AddScoped<IAnalyticsAgent, GoogleAnalyticsAgent>((gaa) => new GoogleAnalyticsAgent(Configuration["AnalyticsKey"]));
             // Add framework services.
             services.AddDbContext<STNDBContext>(options =>
@@ -61,9 +58,11 @@ namespace STNServices
                             opt => opt.MaxBatchSize(1000))
                             .EnableSensitiveDataLogging());
 
-            services.AddScoped<ISTNServicesAgent, STNServicesAgent>(); //instead of this, trying ln56
-            services.AddScoped<IBasicUserAgent, STNServicesAgent>();
-            
+            services.Configure<AWSSettings>(Configuration.GetSection("AWSSettings"));
+
+            services.AddScoped<ISTNServicesAgent, STNAgent.STNServicesAgent>(); //instead of this, trying ln56
+            services.AddScoped<IBasicUserAgent, STNAgent.STNServicesAgent>();
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = BasicDefaults.AuthenticationScheme;
@@ -87,8 +86,6 @@ namespace STNServices
                     .AddJsonOptions(options => loadJsonOptions(options));
 
             // https://aws.amazon.com/blogs/developer/configuring-aws-sdk-with-net-core/
-            services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
-            services.AddAWSService<IAmazonS3>(); // doesn't work
         }
 
      

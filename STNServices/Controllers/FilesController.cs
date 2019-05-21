@@ -24,6 +24,7 @@ using STNDB.Resources;
 using STNAgent;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using WiM.Resources;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.IO;
@@ -71,15 +72,13 @@ namespace STNServices.Controllers
         }
 
         //(fileResource+"/{id}/Item")
-         /*[HttpGet("{id}/Item")]
+         [HttpGet("{id}/Item")]
          public async Task<IActionResult> GetFileItem(int id)
          {
              try
              {
-                 if (id < 0) return new BadRequestResult();
-                 var anEntity = await agent.Find<file>(id);
-                 if (anEntity == null) return new BadRequestObjectResult(new Error(errorEnum.e_notFound));
-                 FileStream fileItem = agent.GetFileItem(anEntity);
+                 if (id < 0) return new BadRequestResult();             
+                 var fileItem = await agent.GetFileItem(id);
                  //sm(agent.Messages);
 
                  return Ok(fileItem);
@@ -89,7 +88,7 @@ namespace STNServices.Controllers
                  //sm(agent.Messages);
                  return await HandleExceptionAsync(ex);
              }
-         }*/
+         }
 /*
          //(hwmResource + "/historicHWMspreadsheet")
          [HttpGet("HWMs/historicHWMspreadsheet")]
@@ -376,91 +375,91 @@ namespace STNServices.Controllers
 
 
         //(eventsResource + "/{eventId}/EventFileItems?FromDate={fromDate}&ToDate={toDate}&State={stateName}&County={county}&FilesFor={filesFor}&HWMFileType={hwmFileTypes}&SensorFileTypes={sensorFileTypes}")
-        /* [STNRequiresRole(new string[] { AdminRole, ManagerRole, FieldRole })]
-         [HttpGet("/Events/{eventId}/EventFileItems")]
-         [Authorize(Policy = "CanModify")]
-         public async Task<IActionResult> GetEventFileItems(Int32 eventId, [FromQuery] string fromDate, [FromQuery] string toDate, [FromQuery] string stateName, [FromQuery] string county, 
-            [FromQuery] string filesFor, [FromQuery] string hwmFileTypes) //, [FromQuery] string sensorFileTypes)
-         {
-             List<file> entities = null;
-             InMemoryFile fileItem = null;
-             char[] delimiterChars = { ';', ',', ' ' };
-             List<decimal> hwmFTList = !string.IsNullOrEmpty(hwmFileTypes) ? hwmFileTypes.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries).Select(decimal.Parse).ToList() : null;
-             List<decimal> sensFTList = !string.IsNullOrEmpty(sensorFileTypes) ? sensorFileTypes.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries).Select(decimal.Parse).ToList() : null;
-             DateTime? FromDate = ValidDate(fromDate);
-             DateTime? ToDate = ValidDate(toDate);
+         //[STNRequiresRole(new string[] { AdminRole, ManagerRole, FieldRole })] WHAT IS THIS?
+         //[HttpGet("/Events/{eventId}/EventFileItems")]
+         //[Authorize(Policy = "CanModify")]
+         //public async Task<IActionResult> GetEventFileItems(Int32 eventId, [FromQuery] string fromDate, [FromQuery] string toDate, [FromQuery] string stateName, [FromQuery] string county, 
+         //   [FromQuery] string filesFor, [FromQuery] string hwmFileTypes) //, [FromQuery] string sensorFileTypes)
+         //{
+         //    List<file> entities = null;
+         //    MemoryStream fileItem = null;
+         //    char[] delimiterChars = { ';', ',', ' ' };
+         //    List<decimal> hwmFTList = !string.IsNullOrEmpty(hwmFileTypes) ? hwmFileTypes.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries).Select(decimal.Parse).ToList() : null;
+         //    List<decimal> sensFTList = !string.IsNullOrEmpty(sensorFileTypes) ? sensorFileTypes.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries).Select(decimal.Parse).ToList() : null;
+         //    DateTime? FromDate = ValidDate(fromDate);
+         //    DateTime? ToDate = ValidDate(toDate);
 
-             try
-             {
-                 if (eventId <= 0 || (string.IsNullOrEmpty(filesFor) && (string.IsNullOrEmpty(sensorFiles)))) throw new BadRequestException("Invalid input parameters");
-                 using (EasySecureString securedPassword = GetSecuredPassword())
-                 {
-                     using (STNAgent sa = new STNAgent(username, securedPassword))
-                     {
-                         //all files for this event
-                         IQueryable<file> allEventFilesQuery = sa.Select<file>().Include(f => f.hwm).Include(f => f.instrument).Include("data_file.instrument")
-                         .Where(f => f.hwm.event_id == eventId || f.instrument.event_id == eventId || f.data_file.instrument.event_id == eventId);
+         //    try
+         //    {
+         //        if (eventId <= 0 || (string.IsNullOrEmpty(filesFor) && (string.IsNullOrEmpty(sensorFiles)))) throw new BadRequestException("Invalid input parameters");
+         //        using (EasySecureString securedPassword = GetSecuredPassword())
+         //        {
+         //            using (STNAgent sa = new STNAgent(username, securedPassword))
+         //            {
+         //                //all files for this event
+         //                IQueryable<file> allEventFilesQuery = sa.Select<file>().Include(f => f.hwm).Include(f => f.instrument).Include("data_file.instrument")
+         //                .Where(f => f.hwm.event_id == eventId || f.instrument.event_id == eventId || f.data_file.instrument.event_id == eventId);
 
-                         IQueryable<file> hwmFilesQuery = null;
-                         IQueryable<file> sensorFilesQuery = null;
+         //                IQueryable<file> hwmFilesQuery = null;
+         //                IQueryable<file> sensorFilesQuery = null;
 
-                         //date range
-                         if (FromDate.HasValue)
-                             allEventFilesQuery = allEventFilesQuery.Where(f => f.file_date >= FromDate);
+         //                //date range
+         //                if (FromDate.HasValue)
+         //                    allEventFilesQuery = allEventFilesQuery.Where(f => f.file_date >= FromDate);
 
-                         if (ToDate.HasValue)
-                             allEventFilesQuery = allEventFilesQuery.Where(f => f.file_date <= ToDate);
+         //                if (ToDate.HasValue)
+         //                    allEventFilesQuery = allEventFilesQuery.Where(f => f.file_date <= ToDate);
 
-                         //state
-                         if (!string.IsNullOrEmpty(stateName))
-                             allEventFilesQuery = allEventFilesQuery.Where(f => f.hwm.site.state.ToUpper() == stateName.ToUpper() ||
-                                        f.instrument.site.state.ToUpper() == stateName.ToUpper() ||
-                                        f.data_file.instrument.site.state.ToUpper() == stateName.ToUpper());
+         //                //state
+         //                if (!string.IsNullOrEmpty(stateName))
+         //                    allEventFilesQuery = allEventFilesQuery.Where(f => f.hwm.site.state.ToUpper() == stateName.ToUpper() ||
+         //                               f.instrument.site.state.ToUpper() == stateName.ToUpper() ||
+         //                               f.data_file.instrument.site.state.ToUpper() == stateName.ToUpper());
 
-                         //county
-                         if (!string.IsNullOrEmpty(county))
-                             allEventFilesQuery = allEventFilesQuery.Where(f => f.hwm.site.county.ToUpper() == county.ToUpper() ||
-                                         f.instrument.site.county.ToUpper() == county.ToUpper() ||
-                                         f.data_file.instrument.site.county.ToUpper() == county.ToUpper());
-                         //only HWM files only
-                         if (filesFor == "HWMs")
-                         {
-                             //only site files
-                             hwmFilesQuery = allEventFilesQuery.Where(f => (f.hwm_id.HasValue && f.hwm_id > 0) && (!f.instrument_id.HasValue || f.instrument_id == 0));
+         //                //county
+         //                if (!string.IsNullOrEmpty(county))
+         //                    allEventFilesQuery = allEventFilesQuery.Where(f => f.hwm.site.county.ToUpper() == county.ToUpper() ||
+         //                                f.instrument.site.county.ToUpper() == county.ToUpper() ||
+         //                                f.data_file.instrument.site.county.ToUpper() == county.ToUpper());
+         //                //only HWM files only
+         //                if (filesFor == "HWMs")
+         //                {
+         //                    //only site files
+         //                    hwmFilesQuery = allEventFilesQuery.Where(f => (f.hwm_id.HasValue && f.hwm_id > 0) && (!f.instrument_id.HasValue || f.instrument_id == 0));
 
-                             //now see which types they want
-                             if (hwmFTList != null && hwmFTList.Count > 0)
-                                 hwmFilesQuery = hwmFilesQuery.Where(f => hwmFTList.Contains(f.filetype_id.Value));
-                         }
-                         //only Sensor files only
-                         if (filesFor == "Sensors")
-                         {
-                             //only site files
-                             sensorFilesQuery = allEventFilesQuery.Where(f => ((!f.hwm_id.HasValue || f.hwm_id == 0) && (!f.objective_point_id.HasValue || f.objective_point_id == 0)) && f.instrument_id.HasValue);
+         //                    //now see which types they want
+         //                    if (hwmFTList != null && hwmFTList.Count > 0)
+         //                        hwmFilesQuery = hwmFilesQuery.Where(f => hwmFTList.Contains(f.filetype_id.Value));
+         //                }
+         //                //only Sensor files only
+         //                if (filesFor == "Sensors")
+         //                {
+         //                    //only site files
+         //                    sensorFilesQuery = allEventFilesQuery.Where(f => ((!f.hwm_id.HasValue || f.hwm_id == 0) && (!f.objective_point_id.HasValue || f.objective_point_id == 0)) && f.instrument_id.HasValue);
 
-                             //now see which types they want
-                             if (sensFTList != null && sensFTList.Count > 0)
-                                 sensorFilesQuery = sensorFilesQuery.Where(f => sensFTList.Contains(f.filetype_id.Value));
-                         }
+         //                    //now see which types they want
+         //                    if (sensFTList != null && sensFTList.Count > 0)
+         //                        sensorFilesQuery = sensorFilesQuery.Where(f => sensFTList.Contains(f.filetype_id.Value));
+         //                }
 
-                         entities = new List<file>();
-                         if (hwmFilesQuery != null) hwmFilesQuery.ToList().ForEach(h => entities.Add(h));
-                         if (sensorFilesQuery != null) sensorFilesQuery.ToList().ForEach(s => entities.Add(s));
+         //                entities = new List<file>();
+         //                if (hwmFilesQuery != null) hwmFilesQuery.ToList().ForEach(h => entities.Add(h));
+         //                if (sensorFilesQuery != null) sensorFilesQuery.ToList().ForEach(s => entities.Add(s));
 
-                         sm(MessageType.info, "FileCount:" + entities.Count);
-                         fileItem = sa.GetFileItemZip(entities);
+         //                sm(MessageType.info, "FileCount:" + entities.Count);
+         //                fileItem = sa.GetFileItemZip(entities);
 
-                         sm(MessageType.info, "Count: " + entities.Count());
-                         sm(sa.Messages);
-                     }//end using
-                 }//end using
+         //                sm(MessageType.info, "Count: " + entities.Count());
+         //                sm(sa.Messages);
+         //            }//end using
+         //        }//end using
 
-                 return new OperationResult.OK { ResponseResource = fileItem, Description = this.MessageString };
-             }
-             catch (Exception ex)
-             { return HandleException(ex); }
-         }//end HttpMethod.GET
-         */
+         //        return new OperationResult.OK { ResponseResource = fileItem, Description = this.MessageString };
+         //    }
+         //    catch (Exception ex)
+         //    { return HandleException(ex); }
+         //}//end HttpMethod.GET
+         
         #endregion
 
         #region POST
