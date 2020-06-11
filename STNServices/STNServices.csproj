@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <UserSecretsId>75ef085d-ef67-45d6-8f29-2d1190142ef4</UserSecretsId>
     <Version>1.1.0</Version>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -30,6 +31,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
     <PackageReference Include="WiM.Analytics" Version="1.1.0" />
     <PackageReference Include="WiM.DBUtilities" Version="1.1.1" />
     <PackageReference Include="WIM.Exceptions" Version="1.0.1" />
