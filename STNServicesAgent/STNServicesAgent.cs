@@ -54,7 +54,7 @@ namespace STNAgent
         List<sites> GetFilterSites(string @event, string state, string sensorType, string networkName, string oPDefined, string hWMOnly, string hWMSurveyed, string sensorOnly, string rDGOnly);
         List<ReportResource> GetFiltedReportsModel(int ev, string state, string date);
         List<reporting_metrics> GetFiltedReports(string ev, string date, string states);
-        List<sensor_view> GetSensorView(string ViewType, string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType);
+        List<STNDB.Resources.sensor_view> GetSensorView(string ViewType, string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType);
 
         //    InMemoryFile GetFileItem(file anEntity);
         //    InMemoryFile GetHWMSpreadsheetItem();
@@ -613,14 +613,14 @@ namespace STNAgent
             }
         }
                
-        public List<sensor_view> GetSensorView(string ViewType, string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType)
+        public List<STNDB.Resources.sensor_view> GetSensorView(string ViewType, string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType)
         {
             try
             {
-                List<sensor_view> aViewTable = null;
-                IQueryable<sensor_view> query;
+                List<STNDB.Resources.sensor_view> aViewTable = null;
+                IQueryable<STNDB.Resources.sensor_view> query;
 
-                query = this.getTable<sensor_view>(new Object[1] { ViewType.ToString() });
+                query = this.getTable<STNDB.Resources.sensor_view>(new Object[1] { ViewType.ToString() });
 
                 char[] delimiterChars = { ';', ',', ' ' }; char[] countydelimiterChars = { ';', ',' };
                 //parse the requests
@@ -985,7 +985,9 @@ namespace STNAgent
                 else
                     sql = String.Format(getSQLStatement(typeof(T).Name), args);
 
-                return  FromSQL<T>(sql);// .Database.SqlQuery<T>(sql).AsQueryable(); ////TODO::: NOT working ///////
+                var x =  FromSQL<T>(sql);// .Database.SqlQuery<T>(sql).AsQueryable(); ////TODO::: NOT working ///////
+                return x;
+
             }
             catch (Exception ex)
             {
@@ -1031,7 +1033,7 @@ namespace STNAgent
                     return @"SELECT sensor_view.site_id, sensor_view.site_no, sensor_view.site_name, sensor_view.latitude_dd, sensor_view.longitude_dd, sensor_view.county, sensor_view.state, sensor_view.city, sensor_view.instrument_id,
                             sensor_view.event_id, sensor_view.event_name, sensor_view.status, sensor_view.time_stamp, sensor_view.inst_collection_id, sensor_view.event_type_id, sensor_view.event_status_id, sensor_view.status_type_id,
                             sensor_view.deployment_type_id, sensor_view.sensor_type_id
-                            FROM (SELECT s.site_id, s.site_no, s.site_name, s.latitude_dd,s.longitude_dd,s.county,s.state,s.city,i.instrument_id,e.event_id,e.event_name,e.event_start_date,e.event_end_date,i.sensor_type_id,sent.sensor,
+                            FROM (SELECT s.site_id, s.site_no, s.site_name, s.latitude_dd,s.longitude_dd,s.county,s.state,s.city,i.instrument_id,e.event_id,e.event_name,e.event_start_date, e.event_end_date as event_end_date,i.sensor_type_id,sent.sensor,
                                 i.deployment_type_id, dept.method, st.status, ins1.time_stamp, e.event_type_id, e.event_status_id, i.inst_collection_id, st.status_type_id
                                 FROM fradmin.sites s, fradmin.status_type st, fradmin.events e, ((((fradmin.instrument i
                                 JOIN fradmin.instrument_status ins1 ON ((i.instrument_id = ins1.instrument_id)))
@@ -1039,8 +1041,32 @@ namespace STNAgent
                                 LEFT JOIN fradmin.sensor_type sent ON ((sent.sensor_type_id = i.sensor_type_id)))
                                 LEFT JOIN fradmin.deployment_type dept ON ((dept.deployment_type_id = i.deployment_type_id)))
                                 WHERE ((((ins2.instrument_status_id IS NULL) AND (s.site_id = i.site_id)) AND (ins1.status_type_id = st.status_type_id)) AND (i.event_id = e.event_id))) AS sensor_view
-                            WHERE ((sensor_view.sensor_type_id = 1) AND(sensor_view.deployment_type_id = 3));";
-                //return "SELECT * FROM fradmin.barometric_view;";
+                            WHERE ((sensor_view.sensor_type_id = 1) AND(sensor_view.deployment_type_id = 3))"; 
+                    /*
+                    return @"SELECT sensor_view.site_id,
+                        sensor_view.site_no,
+                        sensor_view.site_name,
+                        sensor_view.latitude_dd,
+                        sensor_view.longitude_dd,
+                        sensor_view.county,
+                        sensor_view.state,
+                        sensor_view.city,
+                        sensor_view.instrument_id,
+                        sensor_view.event_id,
+                        sensor_view.event_name,
+                        sensor_view.status,
+                        sensor_view.time_stamp,
+                        sensor_view.inst_collection_id,
+                        sensor_view.event_type_id,
+                        sensor_view.event_status_id,
+                        sensor_view.status_type_id,
+                        sensor_view.deployment_type_id,
+                        sensor_view.sensor_type_id
+                        FROM sensor_view
+                        WHERE ((sensor_view.sensor_type_id = 1) AND (sensor_view.deployment_type_id = 3))"; 
+                */
+            
+            //return "SELECT* FROM fradmin.barometric_view; ";
                 case "met_view":
                     return @"SELECT * FROM meteorological_view;";
                 case "rdg_view":

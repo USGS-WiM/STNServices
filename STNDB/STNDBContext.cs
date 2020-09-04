@@ -77,6 +77,7 @@ namespace STNDB
         public virtual DbSet<status_type> status_type { get; set; }
         public virtual DbSet<vertical_collect_methods> vertical_collect_methods { get; set; }
         public virtual DbSet<vertical_datums> vertical_datums { get; set; }
+        public virtual DbSet<sensor_view> sensor_views { get; set; }
 
         public STNDBContext() : base()
         {
