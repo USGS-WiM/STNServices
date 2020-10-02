@@ -77,8 +77,8 @@ namespace STNServices
                 options.OutputFormatters.Add(new STNCSVOutputFormater());
                 options.FormatterMappings.SetMediaTypeMappingForFormat("csv", MediaTypeHeaderValue.Parse("text/csv"));
             })
-                    .AddXmlSerializerFormatters()
-                    .AddXmlDataContractSeria‌​lizerFormatters()
+                    //.AddXmlSerializerFormatters()
+                    //.AddXmlDataContractSeria‌​lizerFormatters()
                     .AddJsonOptions(options => loadJsonOptions(options));
 
             // https://aws.amazon.com/blogs/developer/configuring-aws-sdk-with-net-core/

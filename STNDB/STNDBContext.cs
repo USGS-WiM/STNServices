@@ -77,7 +77,8 @@ namespace STNDB
         public virtual DbSet<status_type> status_type { get; set; }
         public virtual DbSet<vertical_collect_methods> vertical_collect_methods { get; set; }
         public virtual DbSet<vertical_datums> vertical_datums { get; set; }
-        public virtual DbSet<sensor_view> sensor_views { get; set; }
+        public virtual DbSet<sensor_event> sensor_events { get; set; }
+        public virtual DbSet<sensor> sensors { get; set; }
 
         public STNDBContext() : base()
         {
@@ -103,6 +104,8 @@ namespace STNDB
                 .OnDelete(DeleteBehavior.Cascade);
 
             */
+            modelBuilder.Entity<sensor>().ToTable("sensor_base_view");
+            modelBuilder.Entity<sensor_event>().ToTable("sensor_view");
 
             base.OnModelCreating(modelBuilder);             
         }

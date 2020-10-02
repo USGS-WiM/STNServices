@@ -54,7 +54,7 @@ namespace STNAgent
         List<sites> GetFilterSites(string @event, string state, string sensorType, string networkName, string oPDefined, string hWMOnly, string hWMSurveyed, string sensorOnly, string rDGOnly);
         List<ReportResource> GetFiltedReportsModel(int ev, string state, string date);
         List<reporting_metrics> GetFiltedReports(string ev, string date, string states);
-        List<STNDB.Resources.sensor_view> GetSensorView(string ViewType, string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType);
+        List<STNDB.Resources.Isensor> GetSensorView(string ViewType, string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType);
 
         //    InMemoryFile GetFileItem(file anEntity);
         //    InMemoryFile GetHWMSpreadsheetItem();
@@ -613,14 +613,38 @@ namespace STNAgent
             }
         }
                
-        public List<STNDB.Resources.sensor_view> GetSensorView(string ViewType, string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType)
+        public List<STNDB.Resources.Isensor> GetSensorView(string ViewType, string Event, string EventType, string EventStatus, string States, string County, string CurrentStatus, string CollectionCondition, string SensorType, string DeploymentType)
         {
             try
             {
-                List<STNDB.Resources.sensor_view> aViewTable = null;
-                IQueryable<STNDB.Resources.sensor_view> query;
+                List<STNDB.Resources.Isensor> aViewTable = null;
+                IQueryable<STNDB.Resources.Isensor> query;
 
-                query = this.getTable<STNDB.Resources.sensor_view>(new Object[1] { ViewType.ToString() });
+                //query = this.getTable<STNDB.Resources.sensor_view>(new Object[1] { ViewType.ToString() });
+                //'baro_view', 'met_view', 'rdg_view', 'stormTide_view' or 'waveheight_view'");
+                switch (ViewType)
+                {
+                    case "baro_view":
+                        query = this.Select<STNDB.Resources.sensor>().Where(s => s.sensor_type_id == 1 && s.deployment_type_id == 3);
+                        break;
+                    case "met_view":
+                        query = this.Select<STNDB.Resources.sensor>().Where(s => s.sensor_type_id == 2);
+                        break;
+                    case "rdg_view":
+                        query = this.Select<STNDB.Resources.sensor>().Where(s => s.sensor_type_id == 5);
+                        break;
+                    case "stormTide_view":
+                        query = this.Select<STNDB.Resources.sensor>().Where(s => s.sensor_type_id == 1 && (s.deployment_type_id == 1 || s.deployment_type_id == 2));
+                        break;
+                    case "waveheight_view":
+                        query = this.Select<STNDB.Resources.sensor>().Where(s => s.sensor_type_id == 1 && s.deployment_type_id == 2);
+                        break;
+                    default:
+                        //sensor_base_view maps to default
+                        query = this.Select<STNDB.Resources.sensor_event>();
+                        break;
+                }
+                //query = this.Select<STNDB.Resources.sensor_event>();
 
                 char[] delimiterChars = { ';', ',', ' ' }; char[] countydelimiterChars = { ';', ',' };
                 //parse the requests
@@ -983,10 +1007,11 @@ namespace STNAgent
                         sql = String.Format(getSQLStatement(args[0].ToString()));
                 }
                 else
-                    sql = String.Format(getSQLStatement(typeof(T).Name), args);
+                    sql = @"SELECT * FROM events";
+                    //sql = String.Format(getSQLStatement(typeof(T).Name), args);
 
-                var x =  FromSQL<T>(sql);// .Database.SqlQuery<T>(sql).AsQueryable(); ////TODO::: NOT working ///////
-                return x;
+                return FromSQL<T>(sql);// .Database.SqlQuery<T>(sql).AsQueryable(); ////TODO::: NOT working ///////
+                //return x;
 
             }
             catch (Exception ex)
