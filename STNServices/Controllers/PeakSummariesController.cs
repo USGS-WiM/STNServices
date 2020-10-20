@@ -180,7 +180,7 @@ namespace STNServices.Controllers
             try
             {
                 //sm(agent.Messages);
-                return Ok(agent.GetFiltedPeaks(Event, EventType, EventStatus, States, County, StartDate, EndDate));
+                return Ok(agent.GetFilteredPeaks(Event, EventType, EventStatus, States, County, StartDate, EndDate));
             }
             catch (Exception ex)
             {

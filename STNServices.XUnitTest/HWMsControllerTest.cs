@@ -230,7 +230,7 @@ namespace STNServices.XUnitTest
             throw new NotImplementedException();
         }
 
-        public List<peak_summary> GetFiltedPeaks(string @event, string eventType, string eventStatus, string states, string county, string startDate, string endDate)
+        public List<peak_summary> GetFilteredPeaks(string @event, string eventType, string eventStatus, string states, string county, string startDate, string endDate)
         {
             throw new NotImplementedException();
         }
