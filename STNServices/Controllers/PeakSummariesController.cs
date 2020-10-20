@@ -117,12 +117,13 @@ namespace STNServices.Controllers
             {
                 if (siteId < 0) return new BadRequestResult();
 
-                //TODO sql statements are not working
-                var objectRequested = agent.getTable<peak_view>(new Object[1] { null }).Where(p => p.site_id == siteId).ToList();
+                //Built peak_view on GetSitePeakSummaries method instead of gettables()
+                var objectsRequested = agent.Select<STNDB.Resources.peak_view>().Where(p => p.site_id == siteId);
 
-                if (objectRequested == null) return new BadRequestObjectResult(new Error(errorEnum.e_notFound));
+
+                if (objectsRequested == null) return new BadRequestObjectResult(new Error(errorEnum.e_notFound));
                 //sm(agent.Messages);
-                return Ok(objectRequested);
+                return Ok(objectsRequested);
             }
             catch (Exception ex)
             {

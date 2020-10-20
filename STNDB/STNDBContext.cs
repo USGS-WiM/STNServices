@@ -79,6 +79,7 @@ namespace STNDB
         public virtual DbSet<vertical_datums> vertical_datums { get; set; }
         public virtual DbSet<sensor_event> sensor_events { get; set; }
         public virtual DbSet<sensor> sensors { get; set; }
+        public virtual DbSet<peak_view> peak_view { get; set; }
 
         public STNDBContext() : base()
         {

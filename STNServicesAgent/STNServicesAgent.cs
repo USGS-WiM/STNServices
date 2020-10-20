@@ -1003,7 +1003,7 @@ namespace STNAgent
                 if (args[0] != null)
                 {
                     if (args[0].ToString() == "baro_view" || args[0].ToString() == "met_view" || args[0].ToString() == "rdg_view" || args[0].ToString() == "stormtide_view" || args[0].ToString() == "waveheight_view" ||
-                         args[0].ToString() == "pressuretemp_view" || args[0].ToString() == "therm_view" || args[0].ToString() == "webcam_view" || args[0].ToString() == "raingage_view")
+                         args[0].ToString() == "pressuretemp_view" || args[0].ToString() == "therm_view" || args[0].ToString() == "webcam_view" || args[0].ToString() == "raingage_view" || args[0].ToString() == "peak_view")
                         sql = String.Format(getSQLStatement(args[0].ToString()));
                 }
                 else
